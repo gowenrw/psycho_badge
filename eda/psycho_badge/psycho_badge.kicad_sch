@@ -1,0 +1,20 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "383c7e30-34ab-4d08-9f05-43268c03e93d")
+	(paper "USLetter")
+	(title_block
+		(title "psycho_badge")
+		(date "2025-05-31")
+		(rev "1")
+		(company "Crafted by @alt_bier a.k.a. Richard Gowen")
+	)
+	(lib_symbols)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
