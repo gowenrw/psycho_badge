@@ -86,16 +86,6 @@
 		(uuid "7f179de7-7188-4c3c-9eab-237beddb0175")
 	)
 	(fp_line
-		(start 76.2 56.6)
-		(end 76.2 -45)
-		(stroke
-			(width 0.2)
-			(type solid)
-		)
-		(layer "Dwgs.User")
-		(uuid "c67b7378-6e21-4c4e-bf01-c3bc143c7fb0")
-	)
-	(fp_line
 		(start -76.2 -45)
 		(end -76.2 56.6)
 		(stroke
