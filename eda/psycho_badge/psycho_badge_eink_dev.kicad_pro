@@ -451,7 +451,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "psycho_badge.kicad_pro",
+    "filename": "psycho_badge_eink_dev.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -486,11 +486,11 @@
     "last_paths": {
       "gencad": "",
       "idf": "",
-      "netlist": "psycho_badge.net",
-      "plot": "gerber/",
+      "netlist": "psycho_badge_eink_dev.net",
+      "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "psycho_badge.stl",
+      "step": "",
       "svg": "",
       "vrml": ""
     },

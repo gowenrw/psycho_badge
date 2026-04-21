@@ -229,7 +229,7 @@
 		(uuid "41a6980d-8124-4093-8979-b7874843e4bb")
 	)
 	(embedded_fonts no)
-	(model "${KICAD9_3DMODEL_DIR}/Inductor_SMD.3dshapes/L_APV_ANR3015.step"
+	(model "${KIPRJMOD}/3d_models/L_APV_ANR3015.step"
 		(offset
 			(xyz 0 0 0)
 		)
