@@ -654,7 +654,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "XYECONN FPC05-H0.5-24AH2.0 With Pin Descr For GDRM0154 EINK Display"
+			(property "Description" "XYECONN FPC05-H0.5-24AH2.0 With Pin Descr For GDEM0154 EINK Display"
 				(at 19.05 -3.302 90)
 				(effects
 					(font
@@ -7356,7 +7356,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "XYECONN FPC05-H0.5-24AH2.0 With Pin Descr For GDRM0154 EINK Display"
+		(property "Description" "XYECONN FPC05-H0.5-24AH2.0 With Pin Descr For GDEM0154 EINK Display"
 			(at 218.44 98.552 90)
 			(effects
 				(font
