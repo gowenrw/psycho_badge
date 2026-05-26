@@ -151,5 +151,5 @@ code/arduino_cli_setup.log
 # Since binaries are ignored above we need to allow the few we want
 !code/*/build/*/*.bin
 # Keep local library code if exists since directory ignored above
-!code/libraries/PROJECTNAME*
-!code/libraries/PROJECTNAME*/**
+!code/libraries/psycho_badge_lib*
+!code/libraries/psycho_badge_lib*/**
