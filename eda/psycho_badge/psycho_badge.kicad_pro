@@ -487,7 +487,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "psycho_badge.net",
-      "plot": "gerber/",
+      "plot": "../../art/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "psycho_badge.stl",
