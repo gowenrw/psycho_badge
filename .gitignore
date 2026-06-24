@@ -153,3 +153,8 @@ code/arduino_cli_setup.log
 # Keep local library code if exists since directory ignored above
 !code/libraries/psycho_badge_lib*
 !code/libraries/psycho_badge_lib*/**
+
+# ###################################################################
+# Scratch directories
+# ###################################################################
+testing/
