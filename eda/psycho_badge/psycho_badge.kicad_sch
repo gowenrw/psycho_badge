@@ -6,7 +6,7 @@
 	(paper "USLetter")
 	(title_block
 		(title "psycho_badge")
-		(date "2026-06-22")
+		(date "2026-06-29")
 		(rev "1")
 		(company "Crafted by @alt_bier a.k.a. Richard Gowen")
 	)
@@ -2875,7 +2875,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "0_local:SYM_Touch_lg"
+		(symbol "0_local:SYM_Touch_lg_x4"
 			(pin_names
 				(offset 1.016)
 			)
@@ -2883,14 +2883,14 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "TCH"
-				(at -3.81 3.81 0)
+				(at 0 -6.35 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Value" "SYM_Touch_lg"
+			(property "Value" "SYM_Touch_lg_x4"
 				(at 0 -6.35 0)
 				(effects
 					(font
@@ -2935,7 +2935,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "SYM_Touch_lg_0_0"
+			(symbol "SYM_Touch_lg_x4_0_0"
 				(polyline
 					(pts
 						(xy 0.4826 -5.1308) (xy 5.3848 -5.1308) (xy 5.3848 -5.1054) (xy 5.334 -5.0546) (xy 5.2832 -4.953)
@@ -2989,7 +2989,7 @@
 					)
 				)
 			)
-			(symbol "SYM_Touch_lg_0_1"
+			(symbol "SYM_Touch_lg_x4_0_1"
 				(polyline
 					(pts
 						(xy -5.334 -5.08) (xy 5.334 -5.08) (xy 0 3.81) (xy -5.334 -5.08)
@@ -3003,9 +3003,45 @@
 					)
 				)
 			)
-			(symbol "SYM_Touch_lg_1_1"
+			(symbol "SYM_Touch_lg_x4_1_1"
 				(pin passive line
-					(at 2.54 3.81 180)
+					(at -7.62 -5.08 0)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -2.54 3.81 0)
 					(length 2.54)
 					(name ""
 						(effects
@@ -3015,6 +3051,24 @@
 						)
 					)
 					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 7.62 -5.08 180)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3315,7 +3369,7 @@
 	)
 	(rectangle
 		(start 15.24 24.13)
-		(end 110.49 46.99)
+		(end 82.804 46.99)
 		(stroke
 			(width 0)
 			(type default)
@@ -3386,6 +3440,19 @@
 			(justify left bottom)
 		)
 		(uuid "26d33f59-5461-45e4-a104-7825c9a1197c")
+	)
+	(text "This represents four differnt\ncapacitive touch zones\nin a single footprint"
+		(exclude_from_sim no)
+		(at 16.764 43.688 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "4741bfcf-1f7e-48de-a33b-5dffeac0b020")
 	)
 	(text "Input Only"
 		(exclude_from_sim no)
@@ -3916,16 +3983,6 @@
 	)
 	(wire
 		(pts
-			(xy 69.85 33.02) (xy 73.66 33.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "092323c5-ae09-4d8f-b87d-720dc43d76ae")
-	)
-	(wire
-		(pts
 			(xy 125.73 142.24) (xy 146.05 142.24)
 		)
 		(stroke
@@ -3973,16 +4030,6 @@
 			(type default)
 		)
 		(uuid "105dd6dc-ea5a-4fd0-9ca1-ccfad123f746")
-	)
-	(wire
-		(pts
-			(xy 48.26 33.02) (xy 52.07 33.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "12e342c7-6ebb-4be6-bd75-629789d0d46a")
 	)
 	(wire
 		(pts
@@ -4286,16 +4333,6 @@
 	)
 	(wire
 		(pts
-			(xy 26.67 33.02) (xy 30.48 33.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3e9f8b00-fe32-45f1-84f9-c4e2e509d111")
-	)
-	(wire
-		(pts
 			(xy 173.99 113.03) (xy 177.8 113.03)
 		)
 		(stroke
@@ -4333,6 +4370,16 @@
 			(type default)
 		)
 		(uuid "4a23f530-4580-49f6-8910-5754bed912ee")
+	)
+	(wire
+		(pts
+			(xy 52.07 41.91) (xy 55.88 41.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4a725d96-9e7c-45f2-8bee-d842757978d5")
 	)
 	(wire
 		(pts
@@ -4846,6 +4893,16 @@
 	)
 	(wire
 		(pts
+			(xy 52.07 36.83) (xy 58.42 36.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "87bd687c-6d02-49ae-a0c4-b3074d95a553")
+	)
+	(wire
+		(pts
 			(xy 24.13 115.57) (xy 26.67 115.57)
 		)
 		(stroke
@@ -5106,6 +5163,16 @@
 	)
 	(wire
 		(pts
+			(xy 52.07 33.02) (xy 60.96 33.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ab0e7f43-c841-4ac8-b3b6-424f4a4cef5a")
+	)
+	(wire
+		(pts
 			(xy 146.05 105.41) (xy 146.05 111.76)
 		)
 		(stroke
@@ -5273,16 +5340,6 @@
 			(type default)
 		)
 		(uuid "c1e186a9-5665-48c7-863f-cda7e67561cc")
-	)
-	(wire
-		(pts
-			(xy 91.44 33.02) (xy 95.25 33.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c2466295-1c69-4623-8fd1-e3847887cea4")
 	)
 	(wire
 		(pts
@@ -5563,6 +5620,16 @@
 			(type default)
 		)
 		(uuid "ed536ba4-82fb-49f9-ba92-2c3abd9ef2fb")
+	)
+	(wire
+		(pts
+			(xy 71.12 41.91) (xy 74.93 41.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ee8a9c11-6606-4353-aafb-43ae0c8d369c")
 	)
 	(wire
 		(pts
@@ -8206,7 +8273,7 @@
 	)
 	(global_label "4"
 		(shape output)
-		(at 26.67 33.02 180)
+		(at 52.07 33.02 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -8216,7 +8283,7 @@
 		)
 		(uuid "0c4d5cbf-1e71-4c82-98ce-84bb0bd0bbb1")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 22.4753 33.02 0)
+			(at 47.8753 33.02 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8270,7 +8337,7 @@
 			)
 		)
 	)
-	(global_label "14"
+	(global_label "27"
 		(shape input)
 		(at 24.13 115.57 180)
 		(fields_autoplaced yes)
@@ -8338,22 +8405,22 @@
 	)
 	(global_label "13"
 		(shape output)
-		(at 91.44 33.02 180)
+		(at 74.93 41.91 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
 		(uuid "31feb8c1-2d07-4458-bd9e-896ae6b188dd")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 86.0358 33.02 0)
+			(at 80.3342 41.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 				(hide yes)
 			)
 		)
@@ -8536,7 +8603,7 @@
 	)
 	(global_label "2"
 		(shape output)
-		(at 48.26 33.02 180)
+		(at 52.07 36.83 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -8546,7 +8613,7 @@
 		)
 		(uuid "516810ca-b6f4-44ba-8c90-0c6195b14a72")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 44.0653 33.02 0)
+			(at 47.8753 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8644,7 +8711,7 @@
 			)
 		)
 	)
-	(global_label "32"
+	(global_label "33"
 		(shape input)
 		(at 63.5 71.12 0)
 		(fields_autoplaced yes)
@@ -8798,7 +8865,7 @@
 			)
 		)
 	)
-	(global_label "27"
+	(global_label "14"
 		(shape input)
 		(at 24.13 152.4 180)
 		(fields_autoplaced yes)
@@ -8908,7 +8975,7 @@
 			)
 		)
 	)
-	(global_label "26"
+	(global_label "25"
 		(shape input)
 		(at 110.49 83.82 0)
 		(fields_autoplaced yes)
@@ -8954,7 +9021,7 @@
 	)
 	(global_label "15"
 		(shape output)
-		(at 69.85 33.02 180)
+		(at 52.07 41.91 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -8964,7 +9031,7 @@
 		)
 		(uuid "c63b4bc3-c493-41cb-9a18-c1320e8e1115")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 64.4458 33.02 0)
+			(at 46.6658 41.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9172,7 +9239,7 @@
 			)
 		)
 	)
-	(global_label "25"
+	(global_label "26"
 		(shape input)
 		(at 110.49 71.12 0)
 		(fields_autoplaced yes)
@@ -9260,7 +9327,7 @@
 			)
 		)
 	)
-	(global_label "33"
+	(global_label "32"
 		(shape input)
 		(at 63.5 83.82 0)
 		(fields_autoplaced yes)
@@ -10185,72 +10252,6 @@
 		)
 	)
 	(symbol
-		(lib_id "0_local:SYM_Touch_lg")
-		(at 76.2 36.83 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "32da88ce-9ae5-4b99-8903-66b0c818da19")
-		(property "Reference" "TCH3"
-			(at 69.85 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-					(bold yes)
-				)
-			)
-		)
-		(property "Value" "SYM_Touch_lg"
-			(at 76.2 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 76.327 37.592 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 76.327 37.592 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 76.2 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "a88552e6-5ddf-469a-9514-bee57b40863e")
-		)
-		(instances
-			(project "psycho_badge"
-				(path "/383c7e30-34ab-4d08-9f05-43268c03e93d"
-					(reference "TCH3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "0_local:SW_SPDT_SS12D00G")
 		(at 128.27 177.8 0)
 		(mirror y)
@@ -10813,6 +10814,81 @@
 			(project "psycho_badge"
 				(path "/383c7e30-34ab-4d08-9f05-43268c03e93d"
 					(reference "D11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "0_local:SYM_Touch_lg_x4")
+		(at 63.5 36.83 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "59da59e2-c619-43e4-9251-fd3e37ae93be")
+		(property "Reference" "TCH1"
+			(at 63.5 30.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.254)
+					(bold yes)
+				)
+			)
+		)
+		(property "Value" "SYM_Touch_lg_x4"
+			(at 63.5 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "0_badge:psycho_badge_top_art_fcu"
+			(at 63.5 45.212 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.373 37.592 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "ESD warning/\"Do not touch\" symbol, large"
+			(at 63.5 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "4"
+			(uuid "42035413-e1b6-436a-afcf-509c8e153a1a")
+		)
+		(pin "1"
+			(uuid "2c1fbd22-b060-41a4-91b7-b2e82b6018a8")
+		)
+		(pin "3"
+			(uuid "772f4155-81b9-4969-933e-9964f04803b2")
+		)
+		(pin "2"
+			(uuid "45bbf81a-761b-4716-96a3-f460413019b4")
+		)
+		(instances
+			(project "psycho_badge"
+				(path "/383c7e30-34ab-4d08-9f05-43268c03e93d"
+					(reference "TCH1")
 					(unit 1)
 				)
 			)
@@ -12255,72 +12331,6 @@
 		)
 	)
 	(symbol
-		(lib_id "0_local:SYM_Touch_lg")
-		(at 33.02 36.83 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "a728c7af-4bdb-49e9-af1c-e7235f559b93")
-		(property "Reference" "TCH0"
-			(at 26.67 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-					(bold yes)
-				)
-			)
-		)
-		(property "Value" "SYM_Touch_lg"
-			(at 33.02 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 33.147 37.592 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 33.147 37.592 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 33.02 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "00de8292-02f9-4497-82ed-6882e0c66668")
-		)
-		(instances
-			(project "psycho_badge"
-				(path "/383c7e30-34ab-4d08-9f05-43268c03e93d"
-					(reference "TCH0")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "0_local:LED_WS2812D_THT_5mm")
 		(at 44.45 152.4 0)
 		(unit 1)
@@ -13334,72 +13344,6 @@
 		)
 	)
 	(symbol
-		(lib_id "0_local:SYM_Touch_lg")
-		(at 54.61 36.83 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "f5a031e9-39c6-413f-ac4c-653ecb6e19b0")
-		(property "Reference" "TCH2"
-			(at 48.26 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-					(bold yes)
-				)
-			)
-		)
-		(property "Value" "SYM_Touch_lg"
-			(at 54.61 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 54.737 37.592 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 54.737 37.592 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 54.61 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "e19e4843-610c-4f15-b357-3c6d69f5589b")
-		)
-		(instances
-			(project "psycho_badge"
-				(path "/383c7e30-34ab-4d08-9f05-43268c03e93d"
-					(reference "TCH2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 29.21 123.19 0)
 		(unit 1)
@@ -13524,72 +13468,6 @@
 			(project "psycho_badge"
 				(path "/383c7e30-34ab-4d08-9f05-43268c03e93d"
 					(reference "#PWR09")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "0_local:SYM_Touch_lg")
-		(at 97.79 36.83 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "ffa65f30-e1ab-46bf-a0a0-76547fc34a96")
-		(property "Reference" "TCH4"
-			(at 91.44 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-					(bold yes)
-				)
-			)
-		)
-		(property "Value" "SYM_Touch_lg"
-			(at 97.79 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 97.917 37.592 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 97.917 37.592 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 97.79 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "0414f199-8418-474d-bebf-e39a656145f8")
-		)
-		(instances
-			(project "psycho_badge"
-				(path "/383c7e30-34ab-4d08-9f05-43268c03e93d"
-					(reference "TCH4")
 					(unit 1)
 				)
 			)

@@ -62,36 +62,6 @@
 			(width 0.2)
 			(type solid)
 		)
-		(layer "Dwgs.User")
-		(uuid "9958029c-6462-40d1-8418-919df7d5452e")
-	)
-	(fp_line
-		(start -76.2 56.6)
-		(end 76.2 56.6)
-		(stroke
-			(width 0.2)
-			(type solid)
-		)
-		(layer "Dwgs.User")
-		(uuid "8d1c8d33-b029-444c-8f45-584e3831ee33")
-	)
-	(fp_line
-		(start 76.2 -45)
-		(end -76.2 -45)
-		(stroke
-			(width 0.2)
-			(type solid)
-		)
-		(layer "Dwgs.User")
-		(uuid "7f179de7-7188-4c3c-9eab-237beddb0175")
-	)
-	(fp_line
-		(start -76.2 -45)
-		(end -76.2 56.6)
-		(stroke
-			(width 0.2)
-			(type solid)
-		)
 		(layer "Edge.Cuts")
 		(uuid "52bc9d9f-c6ce-444a-b5dd-e2975cd65904")
 	)
