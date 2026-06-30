@@ -10406,7 +10406,7 @@
 	(footprint "0_badge:scream_face_cu_back_55mx80mm"
 		(layer "F.Cu")
 		(uuid "5421e6b3-148e-40db-bc30-fa1f9874ddae")
-		(at 141 84.75)
+		(at 140.05 84.3)
 		(property "Reference" "G***"
 			(at 0.325 -38.425 0)
 			(layer "F.Fab")
@@ -13953,7 +13953,7 @@
 			(type solid)
 		)
 		(fill yes)
-		(layer "F.SilkS")
+		(layer "F.Mask")
 		(uuid "5a3f6218-a571-44dc-b125-159e17a689e7")
 	)
 	(gr_circle
@@ -13964,7 +13964,7 @@
 			(type solid)
 		)
 		(fill yes)
-		(layer "F.SilkS")
+		(layer "F.Mask")
 		(uuid "6fdff504-d537-43c4-8f9e-ff61d42c0cbc")
 	)
 	(gr_circle
@@ -13975,7 +13975,7 @@
 			(type solid)
 		)
 		(fill yes)
-		(layer "B.SilkS")
+		(layer "B.Mask")
 		(uuid "ba57df78-465b-4be5-8a16-c461bf03033e")
 	)
 	(gr_circle
@@ -13986,7 +13986,7 @@
 			(type solid)
 		)
 		(fill yes)
-		(layer "B.SilkS")
+		(layer "B.Mask")
 		(uuid "2d1bf0bb-6ecd-48b1-981c-ed6fd89e8724")
 	)
 	(gr_line
