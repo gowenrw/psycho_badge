@@ -2,20 +2,13 @@
 layout: default
 ---
 
-![Hero Image](Hero.gif)
+![Hero Image](Hero.png)
 
-# psycho_badge
+# Psycho Badge
 
-Welcome to the psycho_badge website.
+Welcome to the Psycho Badge website.
 
-Information about the project.
+Information about the project is coming soon.
 
--- [@alt_bier](https://twitter.com/alt_bier)  - [My Contact Info](https://gowen.net/about)
+-- [@alt_bier](https://twitter.com/alt_bier)
 
----
-
-![Prototype Image](Proto.gif)
-
-# Details
-
-Detailed Information about the project.
