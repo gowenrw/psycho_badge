@@ -531,7 +531,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "psycho_badge.net",
-      "plot": "../../art/",
+      "plot": "gerber/psycho_badge_20260701/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "psycho_badge.stl",
