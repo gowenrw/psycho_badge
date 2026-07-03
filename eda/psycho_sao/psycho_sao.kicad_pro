@@ -503,7 +503,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "psycho_sao.net",
-      "plot": "../../art/",
+      "plot": "gerber/psycho_sao_20260703/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
