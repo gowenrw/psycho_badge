@@ -17,3 +17,8 @@ This is the file structure of this repository
     * ./lib_fp/ - This directory contains footprint module directories
     * ./lib_sh/ - This directory contains schematic library files
     * ./snapshots/ - This directory contains prints of schematic / cad files and images of preview / final product
+
+
+153.8 144.6
+
+124.2 94.5

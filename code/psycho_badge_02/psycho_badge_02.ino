@@ -31,16 +31,16 @@
 // (Note: GPIO 22 is used for the onboard LED on this board)
 //
 // NeoPixel Data Pins
-#define NEO01_DATA 28
-#define NEO02_DATA 14
+#define NEO01_DATA 27 // Defcon
+#define NEO02_DATA 14 // Motel
 //
 // One color LED Pins
-#define LED_D1 33
-#define LED_D2 32
-#define LED_D3 26
-#define LED_D4 25
-#define LED_D5 19
-#define LED_D6 12
+#define LED_D1 33 // FREE
+#define LED_D2 32 // WIFI
+#define LED_D3 26 // Clouds x2
+#define LED_D4 25 // Clouds
+#define LED_D5 19 // Mansion x2
+#define LED_D6 12 // Room_Door
 //
 // Built-in LED
 #define LED_BI 22
@@ -233,6 +233,14 @@ void setup(){
   // EINK SPI Setup
   SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0)); 
   SPI.begin ();
+  //
+  // DISPLAY FIRST IMAGE
+  // if (DebugSerial >= 2) {
+  //   Serial.println("Display EINK Initial Image");
+  // }
+  // EPD_init();            // Full screen update initialization.
+  // PIC_display(gImage_1); // To Display one image using full screen update.
+  // EPD_sleep();           // Enter sleep mode
 
   if (DebugSerial >= 1) {
     Serial.println(F("Setup Done!"));
@@ -656,7 +664,7 @@ void ledAllOff() {
     NEO02.setPixelColor(1, 0, 0, 0);
     NEO02.setPixelColor(2, 0, 0, 0);
     NEO02.setPixelColor(3, 0, 0, 0);
-    NEO02.setPixelColor(3, 0, 0, 0);
+    NEO02.setPixelColor(4, 0, 0, 0);
     NEO02.show();
 }
 //
