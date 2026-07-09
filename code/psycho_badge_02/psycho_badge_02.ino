@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "Adafruit_NeoPixel.h"
-#include "SPI.h"
+#include <SPI.h>
 #include <driver/adc.h>
 #include <esp_wifi_types.h>
 #include <esp_wifi.h>
@@ -14,7 +14,6 @@
 #include "Ap_29demo.h"
 // Include CTF Library
 // #include <psycho_badge_lib.h>
-
 
 // Pin Definitions
 //
@@ -65,6 +64,10 @@
 #define EPD_CS_PIN 5
 #define EPD_CLK_PIN 18
 #define EPD_SDI_PIN 23
+//
+// Remapping standard SPI MISO pin due to conflict
+#define NEW_MISO_PIN 0  // was 19 which is now and LED since EINK display does not use MISO
+
 
 // ENABLE EINK TEST LOOP - DISABLES MAIN BADGE LOOP
 #define EINK_TEST_LOOP 0
@@ -232,15 +235,17 @@ void setup(){
   //
   // EINK SPI Setup
   SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0)); 
-  SPI.begin ();
+  //SPI.begin ();
+  SPI.begin(EPD_CLK_PIN, NEW_MISO_PIN, EPD_SDI_PIN, EPD_CS_PIN);
   //
   // DISPLAY FIRST IMAGE
-  // if (DebugSerial >= 2) {
-  //   Serial.println("Display EINK Initial Image");
-  // }
+  if (DebugSerial >= 2) {
+    Serial.println("Display EINK Initial Image");
+  }
   // EPD_init();            // Full screen update initialization.
-  // PIC_display(gImage_1); // To Display one image using full screen update.
-  // EPD_sleep();           // Enter sleep mode
+  EPD_init_Fast();       // Fast screen update initialization.
+  PIC_display(gImage_1); // To Display one image using full screen update.
+  EPD_sleep();           // Enter sleep mode
 
   if (DebugSerial >= 1) {
     Serial.println(F("Setup Done!"));

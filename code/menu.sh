@@ -39,15 +39,78 @@ CTxtERROR(){
 ## MENU FUNCTIONS
 ########################################
 GetBoardSerial(){
-  BoardSerial=$(arduino-cli --config-file arduino-cli.yml board list | grep serial | head -n 1 | awk '{print $1}')
-  if [ ! $BoardSerial ]
+  # BoardSerial=$(arduino-cli --config-file arduino-cli.yml board list | grep serial | head -n 1 | awk '{print $1}')
+  # if [ ! $BoardSerial ]
+  # then
+  #   BoardSerial="not-set"
+  # fi
+
+  local serial_ports
+  local port_count
+  local selected_index
+
+  mapfile -t serial_ports < <(arduino-cli --config-file arduino-cli.yml board list | grep serial | awk '{print $1}')
+  port_count=${#serial_ports[@]}
+
+  if [ "$port_count" -eq 0 ]
   then
     BoardSerial="not-set"
+  elif [ "$port_count" -eq 1 ]
+  then
+    BoardSerial="${serial_ports[0]}"
+  else
+    echo "$(CTxtYellow 'MULTIPLE SERIAL PORTS DETECTED')"
+    for i in "${!serial_ports[@]}"
+    do
+      echo "$(CTxtGreen "$((i + 1)).") $(CTxtBlue "${serial_ports[$i]}")"
+    done
+
+    while true
+    do
+      read -p "$(CTxtGreen '####') $(CTxtBlue 'CHOOSE A SERIAL PORT >>') " selected_index
+      if [[ "$selected_index" =~ ^[0-9]+$ ]] && [ "$selected_index" -ge 1 ] && [ "$selected_index" -le "$port_count" ]
+      then
+        BoardSerial="${serial_ports[$((selected_index - 1))]}"
+        break
+      fi
+      echo "$(CTxtERROR 'INVALID SERIAL PORT SELECTION')"
+    done
   fi
 }
 GetCodeSketch(){
-  ls -d future*/
-  read -e -p "$(CTxtGreen '####') $(CTxtBlue 'CHOOSE A CODE SKETCH >>') " -i "$CodeSketch" CodeSketch
+  local sketch_dirs
+  local sketch_count
+  local selected_index
+
+  mapfile -t sketch_dirs < <(find . -maxdepth 1 -mindepth 1 -type d -name 'psycho_badge_*' -printf '%f\n' | sort)
+  sketch_count=${#sketch_dirs[@]}
+
+  if [ "$sketch_count" -eq 0 ]
+  then
+    echo "$(CTxtERROR 'NO CODE SKETCH DIRECTORIES FOUND')"
+    return
+  elif [ "$sketch_count" -eq 1 ]
+  then
+    CodeSketch="${sketch_dirs[0]}"
+    return
+  fi
+
+  echo "$(CTxtYellow 'AVAILABLE CODE SKETCHES')"
+  for i in "${!sketch_dirs[@]}"
+  do
+    echo "$(CTxtGreen "$((i + 1)).") $(CTxtBlue "${sketch_dirs[$i]}")"
+  done
+
+  while true
+  do
+    read -p "$(CTxtGreen '####') $(CTxtBlue 'CHOOSE A CODE SKETCH >>') " selected_index
+    if [[ "$selected_index" =~ ^[0-9]+$ ]] && [ "$selected_index" -ge 1 ] && [ "$selected_index" -le "$sketch_count" ]
+    then
+      CodeSketch="${sketch_dirs[$((selected_index - 1))]}"
+      break
+    fi
+    echo "$(CTxtERROR 'INVALID CODE SKETCH SELECTION')"
+  done
 }
 MinicomSerialMonitor(){
   minicom -D $BoardSerial -b 115200
