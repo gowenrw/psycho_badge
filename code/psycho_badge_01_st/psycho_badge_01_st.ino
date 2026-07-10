@@ -1,4 +1,4 @@
-// psycho badge code rev01_61H
+// psycho badge code rev01
 
 // Include Libraries
 #include <Arduino.h>
@@ -11,9 +11,10 @@
 // EINK Display Libraries
 #include "Display_EPD_W21_spi.h"
 #include "Display_EPD_W21.h"
-#include "Ap_29demo.h"
+#include "posters.h"
 // Include CTF Library
 // #include <psycho_badge_lib.h>
+
 
 
 // Pin Definitions
@@ -169,13 +170,13 @@ void setup(){
   if (DebugSerial >= 2) {
     Serial.println("Configure PWM Channels");
   }
-  ledcSetup(LED_D1_pwm, freq, resolution);
+//  ledcSetup(LED_D1_pwm, freq, resolution);
 
   // Attach the channel to the GPIO to be controlled
   if (DebugSerial >= 2) {
     Serial.println("Attach PWM Channels to LED Pins");
   }
-  ledcAttachPin(LED_D1, LED_D1_pwm);
+//  ledcAttachPin(LED_D1, LED_D1_pwm);
 
   //Normal LED output
   if (DebugSerial >= 2) {
@@ -262,12 +263,12 @@ void loop(){
     if (DebugSerial >= 1) {
       Serial.println(" **** PIC_display");
     }
-    PIC_display(gImage_1); // To Display one image using full screen update.
+    PIC_display(gImage_poster1); // To Display one image using full screen update.
     if (DebugSerial >= 1) {
       Serial.println(" **** EPD_sleep");
     }
     EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-    delay(5000);           // Delay for 5s.
+    delay(3000);           // Delay for 5s.
     /************Fast update mode(12s) Image *******************/
     if (DebugSerial >= 1) {
       Serial.println(" *** EPD Fast Display Image ***");
@@ -277,72 +278,132 @@ void loop(){
     if (DebugSerial >= 1) {
       Serial.println(" **** PIC_display");
     }
-    PIC_display(gImage_1); // To Display one image using full screen update.
+    PIC_display(gImage_poster1); // To Display one image using full screen update.
     if (DebugSerial >= 1) {
       Serial.println(" **** EPD_sleep");
     }
     EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-    delay(5000);           // Delay for 5s.
-    /************Full display ALL BLACK *******************/
+    delay(3000);           // Delay for 5s.
+    /************Fast update mode(12s) Image *******************/
     if (DebugSerial >= 1) {
-      Serial.println(" *** EPD Fast Display ALL BLACK ***");
+      Serial.println(" *** EPD Fast Display Image ***");
       Serial.println(" **** EPD_init_Fast");
     }
-    EPD_init_Fast();            // Full screen update initialization.
+    EPD_init_Fast();       // Fast screen update initialization.
     if (DebugSerial >= 1) {
-      Serial.println(" **** Display_All_Black");
+      Serial.println(" **** PIC_display");
     }
-    Display_All_Black();   // To Display one image using full screen update.
+    PIC_display(gImage_poster2); // To Display one image using full screen update.
     if (DebugSerial >= 1) {
       Serial.println(" **** EPD_sleep");
     }
     EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-    delay(3000);           // Delay for 3s.
-    /************Full display ALL YELLOW *******************/
+    delay(3000);           // Delay for 5s.
+    /************Fast update mode(12s) Image *******************/
     if (DebugSerial >= 1) {
-      Serial.println(" *** EPD Fast Display ALL YELLOW ***");
+      Serial.println(" *** EPD Fast Display Image ***");
       Serial.println(" **** EPD_init_Fast");
     }
-    EPD_init_Fast();            // Full screen update initialization.
+    EPD_init_Fast();       // Fast screen update initialization.
     if (DebugSerial >= 1) {
-      Serial.println(" **** Display_All_Yellow");
+      Serial.println(" **** PIC_display");
     }
-    Display_All_Yellow();  // To Display one image using full screen update.
+    PIC_display(gImage_poster3); // To Display one image using full screen update.
     if (DebugSerial >= 1) {
       Serial.println(" **** EPD_sleep");
     }
     EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-    delay(3000);           // Delay for 3s.
-    /************Full display ALL RED *******************/
+    delay(3000);           // Delay for 5s.
+    /************Fast update mode(12s) Image *******************/
     if (DebugSerial >= 1) {
-      Serial.println(" *** EPD Fast Display ALL RED ***");
+      Serial.println(" *** EPD Fast Display Image ***");
       Serial.println(" **** EPD_init_Fast");
     }
-    EPD_init_Fast();            // Full screen update initialization.
+    EPD_init_Fast();       // Fast screen update initialization.
     if (DebugSerial >= 1) {
-      Serial.println(" **** Display_All_Red");
+      Serial.println(" **** PIC_display");
     }
-    Display_All_Red();     // To Display one image using full screen update.
+    PIC_display(gImage_poster4); // To Display one image using full screen update.
     if (DebugSerial >= 1) {
       Serial.println(" **** EPD_sleep");
     }
     EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-    delay(3000);           // Delay for 3s.
+    delay(3000);           // Delay for 5s.
+    /************Fast update mode(12s) Image *******************/
+    if (DebugSerial >= 1) {
+      Serial.println(" *** EPD Fast Display Image ***");
+      Serial.println(" **** EPD_init_Fast");
+    }
+    EPD_init_Fast();       // Fast screen update initialization.
+    if (DebugSerial >= 1) {
+      Serial.println(" **** PIC_display");
+    }
+    PIC_display(gImage_poster5); // To Display one image using full screen update.
+    if (DebugSerial >= 1) {
+      Serial.println(" **** EPD_sleep");
+    }
+    EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
+    delay(3000);           // Delay for 5s.
+    // /************Full display ALL BLACK *******************/
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" *** EPD Fast Display ALL BLACK ***");
+    //   Serial.println(" **** EPD_init_Fast");
+    // }
+    // EPD_init_Fast();            // Full screen update initialization.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" **** Display_All_Black");
+    // }
+    // Display_All_Black();   // To Display one image using full screen update.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" **** EPD_sleep");
+    // }
+    // EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
+    // delay(3000);           // Delay for 3s.
+    // /************Full display ALL YELLOW *******************/
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" *** EPD Fast Display ALL YELLOW ***");
+    //   Serial.println(" **** EPD_init_Fast");
+    // }
+    // EPD_init_Fast();            // Full screen update initialization.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" **** Display_All_Yellow");
+    // }
+    // Display_All_Yellow();  // To Display one image using full screen update.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" **** EPD_sleep");
+    // }
+    // EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
+    // delay(3000);           // Delay for 3s.
+    // /************Full display ALL RED *******************/
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" *** EPD Fast Display ALL RED ***");
+    //   Serial.println(" **** EPD_init_Fast");
+    // }
+    // EPD_init_Fast();            // Full screen update initialization.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" **** Display_All_Red");
+    // }
+    // Display_All_Red();     // To Display one image using full screen update.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" **** EPD_sleep");
+    // }
+    // EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
+    // delay(3000);           // Delay for 3s.
     /************Full display ALL WHITE *******************/
-    if (DebugSerial >= 1) {
-      Serial.println(" *** EPD Fast Display ALL WHITE ***");
-      Serial.println(" **** EPD_init_Fast");
-    }
-    EPD_init_Fast();            // Full screen update initialization.
-    if (DebugSerial >= 1) {
-      Serial.println(" **** Display_All_White");
-    }
-    Display_All_White();   // To Display one image using full screen update.
-    if (DebugSerial >= 1) {
-      Serial.println(" **** EPD_sleep");
-    }
-    EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-    delay(5000);           // Delay for 5s.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" *** EPD Fast Display ALL WHITE ***");
+    //   Serial.println(" **** EPD_init_Fast");
+    // }
+    // EPD_init_Fast();            // Full screen update initialization.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" **** Display_All_White");
+    // }
+    // Display_All_White();   // To Display one image using full screen update.
+    // if (DebugSerial >= 1) {
+    //   Serial.println(" **** EPD_sleep");
+    // }
+    // EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
+    // delay(5000);           // Delay for 5s.
 
   }
   // //////////////////////////////////

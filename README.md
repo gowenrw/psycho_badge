@@ -8,10 +8,12 @@ This includes code and art and cad and fab files.  All the things.
 
 This is the file structure of this repository
 
-* [/](/README.md) - YOU ARE HERE
+* [/](/README.md) <- YOU ARE HERE
+* [/3d_parts/](./3d_parts/) - 3D models of parts used in this project
 * [/art/](./art/) - Artwork and other graphics created by this project
-  * [/art/inspiration/](./art/inspiration/) - Art and graphics pulled from other sources used as inspiration for this project
   * [/art/fonts/](./art/fonts/) - Fonts used in art and graphics
+  * [/art/inspiration/](./art/inspiration/) - Art and graphics pulled from other sources used as inspiration for this project
+  * [/art/logos/](./art/logos/) - Logos used in this project
 * [/code/](./code/) - All project related Code / Firmware
 * [/docs/](./docs/) - Documentation created by this project including web pages
 * [/eda/](./eda/) - Electronic Design Automation files (i.e. KiCad)

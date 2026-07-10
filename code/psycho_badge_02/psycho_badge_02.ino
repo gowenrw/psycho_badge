@@ -1,4 +1,4 @@
-// g0dzilla_vs badge code rev01
+// psycho badge code rev02
 
 // Include Libraries
 #include <Arduino.h>
@@ -12,6 +12,7 @@
 #include "Display_EPD_W21_spi.h"
 #include "Display_EPD_W21.h"
 #include "Ap_29demo.h"
+#include "posters.h"
 // Include CTF Library
 // #include <psycho_badge_lib.h>
 
@@ -242,9 +243,10 @@ void setup(){
   if (DebugSerial >= 2) {
     Serial.println("Display EINK Initial Image");
   }
-  // EPD_init();            // Full screen update initialization.
-  EPD_init_Fast();       // Fast screen update initialization.
-  PIC_display(gImage_1); // To Display one image using full screen update.
+  EPD_init();            // Full screen update initialization.
+  // EPD_init_Fast();       // Fast screen update initialization.
+  //PIC_display(gImage_1); // To Display one image using full screen update.
+  PIC_display(gImage_poster2); // To Display one image using full screen update.
   EPD_sleep();           // Enter sleep mode
 
   if (DebugSerial >= 1) {

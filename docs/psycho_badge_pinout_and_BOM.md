@@ -24,6 +24,7 @@ EINK Dev Board
 * 17 - DevBd 6 - DS
 * 16 - DevBd 7 - RES
 * 34 - DevBd 8 - BSY
+* 0  - Remap ESP32 MISO default pin 19 (not used by EINK but conflict with LED)
 
 Capacitive Touch Pads
 * 4  - TCH1 1 - Bats
@@ -102,9 +103,10 @@ Custom Dev Board for EINK Display - Qty 1
     * Inductor NR3015 47uH ±20% 350mA 1.195Ohm SMD-3mmx3mm - Qty 1
       * https://www.lcsc.com/product-detail/C42370344.html
 
-Custom 3D printed insert for PCB sandwich mounting - Qty 1
-* 3D printed insert for mounting the PCBs
-  * 4inch x 6inch overall outer dimentions, 10mm tall, 5mm think with 1mm holes for screw mounting, cutout on one side for esp/switch access, divots on top for lanyard hole access.
+Custom 3D printed spacer insert for PCB sandwich mounting - Qty 1
+* 3D printed board spacer for mounting the PCBs
+  * 4inch x 6inch overall outer dimentions, 10mm tall, 5mm think with 1.5mm holes for screw mounting, cutout on one side for esp/switch access, divots on top for lanyard hole access.
+  * [/3d_parts/board_spacer.3mf](/3d_parts/board_spacer.3mf)
 
 M2 Mounting Screws - Qty 8
 * M2 Carbon Steel Cross Phillips Countersunk Pan Head Self Tapping Screws

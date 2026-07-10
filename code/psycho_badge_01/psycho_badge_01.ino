@@ -1,4 +1,4 @@
-// g0dzilla_vs badge code rev01
+// psycho badge code rev01
 
 // Include Libraries
 #include <Arduino.h>
