@@ -12,7 +12,7 @@
 #include "Display_EPD_W21_spi.h"
 #include "Display_EPD_W21.h"
 #include "Ap_29demo.h"
-#include "posters.h"
+#include "psycho_images.h"
 // Include CTF Library
 // #include <psycho_badge_lib.h>
 
@@ -46,10 +46,10 @@
 #define LED_BI 22
 //
 // Capacitive Touch Pins
-// #define TCH01_PIN 4
-// #define TCH02_PIN 2
-// #define TCH03_PIN 14
-// #define TCH04_PIN 13
+#define TCH01_PIN 4    // Bats
+#define TCH02_PIN 2    // Satelite
+#define TCH03_PIN 15   // Car
+#define TCH04_PIN 13   // Knife
 //
 // EINK Display mapping for ESP32 LOLIN D32
 // BUSY -> 34
@@ -67,11 +67,7 @@
 #define EPD_SDI_PIN 23
 //
 // Remapping standard SPI MISO pin due to conflict
-#define NEW_MISO_PIN 0  // was 19 which is now and LED since EINK display does not use MISO
-
-
-// ENABLE EINK TEST LOOP - DISABLES MAIN BADGE LOOP
-#define EINK_TEST_LOOP 0
+#define NEW_MISO_PIN 0  // was 19 which is now LED since EINK does not use MISO
 
 // NeoPixel Properties
 //
@@ -118,27 +114,52 @@ const char* wl_status_to_string(wl_status_t status) {
   }
 }
 
-// // Capacitive Touch Properties
-// //
-// // Touch Thresholds
-// int Touch01_Threshold = 28;
-// // Touch Initial Values
-// int Touch01_Value = 30;
-// //
-// // Touch Counters
-// //
-// // Touch Iteration Counter
-// int Touch01_IntCount = 0;
-// // Touch Iteration Flag
-// int Touch01_IntFlag = 0;
-// // Touch Loop Counter
-// int Touch01_LoopCount = 0;
-// // Touch Loop Threshold (Touch Held for X Loops of Main)
-// int Touch01_Loop_Threshold = 3;
+// Capacitive Touch Properties
+//
+// Touch Thresholds
+int Touch01_Threshold = 28;
+int Touch02_Threshold = 28;
+int Touch03_Threshold = 28;
+int Touch04_Threshold = 28;
+// Touch Initial Values
+int Touch01_Value = 30;
+int Touch02_Value = 30;
+int Touch03_Value = 30;
+int Touch04_Value = 30;
+//
+// Touch Counters
+//
+// Touch Iteration Counter
+int Touch01_IntCount = 0;
+int Touch02_IntCount = 0;
+int Touch03_IntCount = 0;
+int Touch04_IntCount = 0;
+// Touch Iteration Flag
+int Touch01_IntFlag = 0;
+int Touch02_IntFlag = 0;
+int Touch03_IntFlag = 0;
+int Touch04_IntFlag = 0;
+// Touch Loop Counter
+int Touch01_LoopCount = 0;
+int Touch02_LoopCount = 0;
+int Touch03_LoopCount = 0;
+int Touch04_LoopCount = 0;
+// Touch Loop Threshold (Touch Held for X Loops of Main)
+int Touch01_Loop_Threshold = 3;
+int Touch02_Loop_Threshold = 3;
+int Touch03_Loop_Threshold = 3;
+int Touch04_Loop_Threshold = 3;
 
-// Analog Input Values
-// int JSAO01_Value = 0;
-// int JSAO02_Value = 0;
+// Display Image List
+const unsigned char* const DisplayImage[] = {
+  gImage_psycho_display_img01,
+  gImage_psycho_display_img02,
+  gImage_psycho_display_img03,
+  gImage_psycho_display_img04,
+  gImage_psycho_display_img05
+};
+int ImgElement = 1;
+int ImgMax = 4;
 
 // Loop Control Properties
 //
@@ -216,8 +237,8 @@ void setup(){
   ledAllOff();
 
   // Set a Random Seed
-  int myrandseed = (analogRead(0) + analogRead(34) * 2);
-  //t myrandseed = (analogRead(0) + analogRead(34) + (touchRead(TCH01_PIN) * 2));
+  // int myrandseed = (analogRead(0) + analogRead(34) * 2);
+  int myrandseed = (analogRead(0) + analogRead(34) + (touchRead(TCH01_PIN) * 2));
   randomSeed(myrandseed);
   if (DebugSerial >= 2) {
     Serial.print("Set Random Seed "); Serial.println(myrandseed);
@@ -243,11 +264,10 @@ void setup(){
   if (DebugSerial >= 2) {
     Serial.println("Display EINK Initial Image");
   }
-  EPD_init();            // Full screen update initialization.
-  // EPD_init_Fast();       // Fast screen update initialization.
-  //PIC_display(gImage_1); // To Display one image using full screen update.
-  PIC_display(gImage_poster2); // To Display one image using full screen update.
-  EPD_sleep();           // Enter sleep mode
+  // EPD_init();                             // Full screen update initialization.
+  EPD_init_Fast();                        // Fast screen update initialization.
+  PIC_display(DisplayImage[ImgElement]);  // To Display one image at setup
+  EPD_sleep();                            // Enter sleep mode
 
   if (DebugSerial >= 1) {
     Serial.println(F("Setup Done!"));
@@ -267,117 +287,6 @@ void loop(){
   }
 
   // //////////////////////////////////
-  //     BEGIN EINK TEST LOOP
-  // //////////////////////////////////
-  //  SET EINK_TEST_LOOP TO 1
-  //  TO RUN EINK TEST CODE
-  //  INSTEAD OF MAIN BADGE LOOP
-  // //////////////////////////////////
-  // if (EINK_TEST_LOOP == 1) {
-
-  //   if (DebugSerial >= 1) {
-  //     Serial.println("********** EINK TESTING **********");
-  //   }
-
-  //   BI_on(); // Turn on built-in LED to show badge is on
-
-  //   // /************Full display Image *******************/
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" *** EPD Full Display Image ***");
-  //     Serial.println(" **** EPD_init");
-  //   }
-  //   EPD_init();            // Full screen update initialization.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** PIC_display");
-  //   }
-  //   PIC_display(gImage_1); // To Display one image using full screen update.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** EPD_sleep");
-  //   }
-  //   EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-  //   delay(5000);           // Delay for 5s.
-  //   /************Fast update mode(12s) Image *******************/
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" *** EPD Fast Display Image ***");
-  //     Serial.println(" **** EPD_init_Fast");
-  //   }
-  //   EPD_init_Fast();       // Fast screen update initialization.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** PIC_display");
-  //   }
-  //   PIC_display(gImage_1); // To Display one image using full screen update.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** EPD_sleep");
-  //   }
-  //   EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-  //   delay(5000);           // Delay for 5s.
-  //   /************Full display ALL BLACK *******************/
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" *** EPD Fast Display ALL BLACK ***");
-  //     Serial.println(" **** EPD_init_Fast");
-  //   }
-  //   EPD_init_Fast();            // Full screen update initialization.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** Display_All_Black");
-  //   }
-  //   Display_All_Black();   // To Display one image using full screen update.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** EPD_sleep");
-  //   }
-  //   EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-  //   delay(3000);           // Delay for 3s.
-  //   /************Full display ALL YELLOW *******************/
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" *** EPD Fast Display ALL YELLOW ***");
-  //     Serial.println(" **** EPD_init_Fast");
-  //   }
-  //   EPD_init_Fast();            // Full screen update initialization.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** Display_All_Yellow");
-  //   }
-  //   Display_All_Yellow();  // To Display one image using full screen update.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** EPD_sleep");
-  //   }
-  //   EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-  //   delay(3000);           // Delay for 3s.
-  //   /************Full display ALL RED *******************/
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" *** EPD Fast Display ALL RED ***");
-  //     Serial.println(" **** EPD_init_Fast");
-  //   }
-  //   EPD_init_Fast();            // Full screen update initialization.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** Display_All_Red");
-  //   }
-  //   Display_All_Red();     // To Display one image using full screen update.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** EPD_sleep");
-  //   }
-  //   EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-  //   delay(3000);           // Delay for 3s.
-  //   /************Full display ALL WHITE *******************/
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" *** EPD Fast Display ALL WHITE ***");
-  //     Serial.println(" **** EPD_init_Fast");
-  //   }
-  //   EPD_init_Fast();            // Full screen update initialization.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** Display_All_White");
-  //   }
-  //   Display_All_White();   // To Display one image using full screen update.
-  //   if (DebugSerial >= 1) {
-  //     Serial.println(" **** EPD_sleep");
-  //   }
-  //   EPD_sleep();           // Enter sleep mode - do not delete or reduce lifespan of screen.
-  //   delay(5000);           // Delay for 5s.
-
-  // }
-  // //////////////////////////////////
-  //     END EINK TEST LOOP
-  // //////////////////////////////////
-
-  // //////////////////////////////////
   //     START OF MAIN BADGE LOOP
   // //////////////////////////////////
   //     ENSURE EINK_TEST_LOOP NOT 1
@@ -389,10 +298,16 @@ void loop(){
       Serial.println("********** MAIN BADGE LOOP **********");
     }
 
-    // // Capacitive Touch Dynamic Threshold Adjustment
-    // // Adjust thresholds UP to account for assembly conditions and battery vs usb
-    // Touch01_Value = touchRead(TCH01_PIN);
-    // if ( (Touch01_Value / Touch01_Threshold) > 2 ) { Touch01_Threshold = int(Touch01_Threshold * 1.8); }
+    // Capacitive Touch Dynamic Threshold Adjustment
+    // Adjust thresholds UP to account for assembly conditions and battery vs usb
+    Touch01_Value = touchRead(TCH01_PIN);
+    Touch02_Value = touchRead(TCH02_PIN);
+    Touch03_Value = touchRead(TCH03_PIN);
+    Touch04_Value = touchRead(TCH04_PIN);
+    if ( (Touch01_Value / Touch01_Threshold) > 2 ) { Touch01_Threshold = int(Touch01_Threshold * 1.8); }
+    if ( (Touch02_Value / Touch02_Threshold) > 2 ) { Touch02_Threshold = int(Touch02_Threshold * 1.8); }
+    if ( (Touch03_Value / Touch03_Threshold) > 2 ) { Touch03_Threshold = int(Touch03_Threshold * 1.8); }
+    if ( (Touch04_Value / Touch04_Threshold) > 2 ) { Touch04_Threshold = int(Touch04_Threshold * 1.8); }
 
     // //////////////////////////////////
     //     START OF ITERATION LOOP
@@ -409,61 +324,174 @@ void loop(){
         Serial.print(" Pos="); Serial.print(pos);
       }
 
-      // //
-      // // TOUCH
-      // //
-      // // Read Touch Values
-      // Touch01_Value = touchRead(TCH01_PIN);
-      // //
-      // // **************************************************************
-      // //
-      // // Do Stuff If We Detect a Touch on TCH01_PIN
-      // if (Touch01_Value < Touch01_Threshold) {
-      //   // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-      //   if (DebugSerial >= 2) {
-      //     Serial.print(" T1_TCH="); Serial.print(Touch01_Value);
-      //     Serial.print("/"); Serial.print(Touch01_Threshold);
-      //     Serial.print("-"); Serial.print(Touch01_IntCount);
-      //     Serial.print("/"); Serial.print(Touch01_LoopCount);
-      //   }
-      //   // STUFF - TCH01_PIN TOUCHED
-      //   if (Touch01_IntFlag == 0){
-      //     // Put stuff to happen once per iteration loop here
-      //     Touch01_IntFlag = 1;
-      //   }
-      //   // Put stuff to happen every iteration here
-      //   Touch01_IntCount++;
-      //   //
-      //   // **************
-      //   // FUNCTION TO CALL GOES HERE
-      //   // EXAMPLE:
-      //   // monarch_neo_color();
-      //   // **************
-      // //
-      // // Do Stuff If We DONT Detect a Touch on TCH01_PIN
-      // } else {
-      //   // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-      //   if (DebugSerial >= 2) {
-      //     Serial.print(" T1="); Serial.print(Touch01_Value);
-      //     Serial.print("/"); Serial.print(Touch01_Threshold);
-      //     Serial.print("-"); Serial.print(Touch01_IntCount);
-      //     Serial.print("/"); Serial.print(Touch01_LoopCount);
-      //   }
-      //   // STUFF - TCH01_PIN NOT TOUCHED
-      //   if (Touch01_IntCount > 1) { Touch01_IntCount--; } else { Touch01_IntCount = 0; }
-      // }
+      //
+      // TOUCH
+      //
+      // Read Touch Values
+      Touch01_Value = touchRead(TCH01_PIN);
+      Touch02_Value = touchRead(TCH02_PIN);
+      Touch03_Value = touchRead(TCH03_PIN);
+      Touch04_Value = touchRead(TCH04_PIN);
       //
       // **************************************************************
       //
-
-      // Read Analog Input Values
-      // JSAO01_Value = analogRead(JSAO01);
-      // JSAO02_Value = analogRead(JSAO02);
-      // Display Analog Values
-      // if (DebugSerial >= 2) {
-      //   Serial.print(" SAO1="); Serial.print(JSAO01_Value);
-      //   Serial.print(" SAO2="); Serial.print(JSAO02_Value);
-      // }
+      // Do Stuff If We Detect a Touch on TCH01_PIN
+      if (Touch01_Value < Touch01_Threshold) {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print(" T1_TCH="); Serial.print(Touch01_Value);
+          Serial.print("/"); Serial.print(Touch01_Threshold);
+          Serial.print("-"); Serial.print(Touch01_IntCount);
+          Serial.print("/"); Serial.print(Touch01_LoopCount);
+        }
+        // STUFF - TCH01_PIN TOUCHED
+        if (Touch01_IntFlag == 0){
+          // Put stuff to happen once per iteration loop here
+          Touch01_IntFlag = 1;
+        }
+        // Put stuff to happen every iteration here
+        Touch01_IntCount++;
+        //
+        // **************
+        // FUNCTION TO CALL GOES HERE
+        // EXAMPLE:
+        // monarch_neo_color();
+        // **************
+      //
+      // Do Stuff If We DONT Detect a Touch on TCH01_PIN
+      } else {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print(" T1="); Serial.print(Touch01_Value);
+          Serial.print("/"); Serial.print(Touch01_Threshold);
+          Serial.print("-"); Serial.print(Touch01_IntCount);
+          Serial.print("/"); Serial.print(Touch01_LoopCount);
+        }
+        // STUFF - TCH01_PIN NOT TOUCHED
+        if (Touch01_IntCount > 1) { Touch01_IntCount--; } else { Touch01_IntCount = 0; }
+      }
+      //
+      // **************************************************************
+      //
+      // Do Stuff If We Detect a Touch on TCH02_PIN
+      if (Touch02_Value < Touch02_Threshold) {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print(" T2_TCH="); Serial.print(Touch02_Value);
+          Serial.print("/"); Serial.print(Touch02_Threshold);
+          Serial.print("-"); Serial.print(Touch02_IntCount);
+          Serial.print("/"); Serial.print(Touch02_LoopCount);
+        }
+        // STUFF - TCH02_PIN TOUCHED
+        if (Touch02_IntFlag == 0){
+          // Put stuff to happen once per iteration loop here
+          Touch02_IntFlag = 1;
+        }
+        // Put stuff to happen every iteration here
+        Touch02_IntCount++;
+        //
+        // **************
+        // FUNCTION TO CALL GOES HERE
+        // EXAMPLE:
+        // monarch_neo_color();
+        // **************
+      //
+      // Do Stuff If We DONT Detect a Touch on TCH02_PIN
+      } else {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print(" T2="); Serial.print(Touch02_Value);
+          Serial.print("/"); Serial.print(Touch02_Threshold);
+          Serial.print("-"); Serial.print(Touch02_IntCount);
+          Serial.print("/"); Serial.print(Touch02_LoopCount);
+        }
+        // STUFF - TCH02_PIN NOT TOUCHED
+        if (Touch02_IntCount > 1) { Touch02_IntCount--; } else { Touch02_IntCount = 0; }
+      }
+      //
+      // **************************************************************
+      //
+      // Do Stuff If We Detect a Touch on TCH03_PIN
+      if (Touch03_Value < Touch03_Threshold) {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print(" T3_TCH="); Serial.print(Touch03_Value);
+          Serial.print("/"); Serial.print(Touch03_Threshold);
+          Serial.print("-"); Serial.print(Touch03_IntCount);
+          Serial.print("/"); Serial.print(Touch03_LoopCount);
+        }
+        // STUFF - TCH03_PIN TOUCHED
+        if (Touch03_IntFlag == 0){
+          // Put stuff to happen once per iteration loop here
+          Touch03_IntFlag = 1;
+        }
+        // Put stuff to happen every iteration here
+        Touch03_IntCount++;
+        //
+        // **************
+        // FUNCTION TO CALL GOES HERE
+        // EXAMPLE:
+        // monarch_neo_color();
+        // **************
+      //
+      // Do Stuff If We DONT Detect a Touch on TCH03_PIN
+      } else {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print(" T3="); Serial.print(Touch03_Value);
+          Serial.print("/"); Serial.print(Touch03_Threshold);
+          Serial.print("-"); Serial.print(Touch03_IntCount);
+          Serial.print("/"); Serial.print(Touch03_LoopCount);
+        }
+        // STUFF - TCH03_PIN NOT TOUCHED
+        if (Touch03_IntCount > 1) { Touch03_IntCount--; } else { Touch03_IntCount = 0; }
+      }
+      //
+      // **************************************************************
+      //
+      // Do Stuff If We Detect a Touch on TCH04_PIN
+      if (Touch04_Value < Touch04_Threshold) {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print(" T4_TCH="); Serial.print(Touch04_Value);
+          Serial.print("/"); Serial.print(Touch04_Threshold);
+          Serial.print("-"); Serial.print(Touch04_IntCount);
+          Serial.print("/"); Serial.print(Touch04_LoopCount);
+        }
+        // STUFF - TCH04_PIN TOUCHED
+        if (Touch04_IntFlag == 0){
+          // Put stuff to happen once per iteration loop here
+          Touch04_IntFlag = 1;
+          ImgElement++;
+          if (ImgElement > ImgMax) { ImgElement = 0; }
+          EPD_init_Fast();                        // Fast screen update initialization.
+          PIC_display(DisplayImage[ImgElement]);  // To Display one image at setup
+          EPD_sleep();                            // Enter sleep mode
+        }
+        // Put stuff to happen every iteration here
+        Touch04_IntCount++;
+        //
+        // **************
+        // FUNCTION TO CALL GOES HERE
+        // EXAMPLE:
+        // monarch_neo_color();
+        // **************
+      //
+      // Do Stuff If We DONT Detect a Touch on TCH04_PIN
+      } else {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print(" T4="); Serial.print(Touch04_Value);
+          Serial.print("/"); Serial.print(Touch04_Threshold);
+          Serial.print("-"); Serial.print(Touch04_IntCount);
+          Serial.print("/"); Serial.print(Touch04_LoopCount);
+        }
+        // STUFF - TCH04_PIN NOT TOUCHED
+        if (Touch04_IntCount > 1) { Touch04_IntCount--; } else { Touch04_IntCount = 0; }
+      }
+      //
+      // **************************************************************
+      //
 
       if (main_led_mode == 0) {
         //
@@ -531,6 +559,9 @@ void loop(){
       //   }
       }
 
+      // Display Sleep
+      //EPD_sleep();
+      
       // DEBUG - Print NEO color vars
       if (DebugSerial >= 2) {
         Serial.print(" C="); Serial.print(neo_col_red);
@@ -561,11 +592,17 @@ void loop(){
     //     END OF ITERATION LOOP
     // //////////////////////////////////
 
-    // // Touch Loop Counters - USE TBD
-    // if (Touch01_IntCount >= 1) { Touch01_LoopCount++; Touch01_IntCount = 0; } else { Touch01_LoopCount = 0; }
+    // Touch Loop Counters - USE TBD
+    if (Touch01_IntCount >= 1) { Touch01_LoopCount++; Touch01_IntCount = 0; } else { Touch01_LoopCount = 0; }
+    if (Touch02_IntCount >= 1) { Touch02_LoopCount++; Touch02_IntCount = 0; } else { Touch02_LoopCount = 0; }
+    if (Touch03_IntCount >= 1) { Touch03_LoopCount++; Touch03_IntCount = 0; } else { Touch03_LoopCount = 0; }
+    if (Touch04_IntCount >= 1) { Touch04_LoopCount++; Touch04_IntCount = 0; } else { Touch04_LoopCount = 0; }
 
-    // // Reset Touch Iteration Flags
-    // Touch01_IntFlag = 0;
+    // Reset Touch Iteration Flags
+    Touch01_IntFlag = 0;
+    Touch02_IntFlag = 0;
+    Touch03_IntFlag = 0;
+    Touch04_IntFlag = 0;
 
     // Turn off all LEDs at end of loop (Optional for troubleshooting)
     // ledAllOff();
