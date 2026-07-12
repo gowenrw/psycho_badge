@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.7,
-          "height": 1.4,
-          "width": 1.4
+          "drill": 2.7,
+          "height": 2.7,
+          "width": 2.7
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -88,7 +88,7 @@
         "items_not_allowed": "error",
         "length_out_of_range": "error",
         "lib_footprint_issues": "warning",
-        "lib_footprint_mismatch": "warning",
+        "lib_footprint_mismatch": "ignore",
         "malformed_courtyard": "error",
         "microvia_drill_out_of_range": "error",
         "mirrored_text_on_front_layer": "warning",
@@ -102,7 +102,7 @@
         "shorting_items": "error",
         "silk_edge_clearance": "warning",
         "silk_over_copper": "ignore",
-        "silk_overlap": "warning",
+        "silk_overlap": "ignore",
         "skew_out_of_range": "error",
         "solder_mask_bridge": "error",
         "starved_thermal": "error",
@@ -467,7 +467,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "psycho_sao.kicad_pro",
+    "filename": "psycho_sao_2.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -503,7 +503,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "psycho_sao.net",
-      "plot": "gerber/psycho_sao_20260703/",
+      "plot": "gerber/psycho_sao_2_20260711/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",

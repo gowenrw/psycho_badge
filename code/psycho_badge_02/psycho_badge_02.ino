@@ -11,8 +11,11 @@
 // EINK Display Libraries
 #include "Display_EPD_W21_spi.h"
 #include "Display_EPD_W21.h"
-#include "Ap_29demo.h"
-#include "psycho_images.h"
+#include "psycho_img01.h"
+#include "psycho_img02.h"
+#include "psycho_img03.h"
+#include "psycho_img04.h"
+#include "psycho_img05.h"
 // Include CTF Library
 // #include <psycho_badge_lib.h>
 
@@ -77,8 +80,9 @@ Adafruit_NeoPixel NEO02 = Adafruit_NeoPixel(5, NEO02_DATA, NEO_RGB + NEO_KHZ800)
 
 // LED Variables
 //
-// Main LED mode 0=default 1=battleone 2=?
+// Main LED mode 0=default 1=coloshift 2+=?
 int main_led_mode = 0;
+
 //
 // NeoPixel Big Color Value 32 bit = (W-8bit << 24) + (R-8bit << 16) + (G-8bit <<8) + (B-8bit)
 uint32_t neo_big_color = 0;
@@ -87,7 +91,7 @@ uint8_t neo_col_red = 0;
 uint8_t neo_col_grn = 0;
 uint8_t neo_col_blu = 0;
 // Neo Color bitvector 1=red 2=green 4=blue (3=R&G 5=R&B 6=G&B 7=R&G&B)
-int neo_color_bitv = 0;
+int neo_color_bitv = 6;
 
 // // PWM Properties
 // //
@@ -145,26 +149,41 @@ int Touch02_LoopCount = 0;
 int Touch03_LoopCount = 0;
 int Touch04_LoopCount = 0;
 // Touch Loop Threshold (Touch Held for X Loops of Main)
+//   Used to determine if there is a 'Long' touch to trigger specific events
+//   Each Loop is between 6000 and 7000 ms (6 to 7 seconds)
 int Touch01_Loop_Threshold = 3;
 int Touch02_Loop_Threshold = 3;
 int Touch03_Loop_Threshold = 3;
 int Touch04_Loop_Threshold = 3;
+// Touch Iter Threshold (Touch Held for X Iterations in the main loop)
+//   Used to prevent glancing touches activating the touch events
+//   Each iteration is between 3 and 4 ms
+int Touch01_Iter_Threshold = 9;
+int Touch02_Iter_Threshold = 9;
+int Touch03_Iter_Threshold = 9;
+int Touch04_Iter_Threshold = 9;
 
 // Display Image List
 const unsigned char* const DisplayImage[] = {
-  gImage_psycho_display_img01,
-  gImage_psycho_display_img02,
-  gImage_psycho_display_img03,
-  gImage_psycho_display_img04,
-  gImage_psycho_display_img05
+  gImage_psycho_poster_01,
+  gImage_psycho_hitchcock_02,
+  gImage_psycho_mother_03,
+  gImage_scream_04,
+  gImage_dying_reach_05
 };
 int ImgElement = 1;
 int ImgMax = 4;
+int DisplayUpdateCooldownDefault = 2;
+int DisplayUpdateCooldown = DisplayUpdateCooldownDefault;
 
 // Loop Control Properties
 //
-// Main Loop LED Iteration Delay Time [in ms] - Default 20
-int LEDDelayTime = 20;
+// Main Loop LED Iteration Delay Time [in ms] - Default 25
+int LEDDelayTime = 25;
+//
+// Timers
+unsigned long IterTimer = 0;
+unsigned long LoopTimer = 0;
 //
 // Debug Serial - If set greater than 0 it writes to serial for debugging
 // 0 = no debug text
@@ -228,7 +247,9 @@ void setup(){
   NEO01.setBrightness(170);
   NEO02.setBrightness(170);
   // Set an initial random color for neopixel functions
-  setRandomColor();
+  // setRandomColor();
+  // Set an initial static color for the NeoPixels
+  setStaticColor(0, 0, 0, neo_color_bitv);
 
   // Start all LEDs in OFF mode
   if (DebugSerial >= 2) {
@@ -264,10 +285,7 @@ void setup(){
   if (DebugSerial >= 2) {
     Serial.println("Display EINK Initial Image");
   }
-  // EPD_init();                             // Full screen update initialization.
-  EPD_init_Fast();                        // Fast screen update initialization.
-  PIC_display(DisplayImage[ImgElement]);  // To Display one image at setup
-  EPD_sleep();                            // Enter sleep mode
+  fastDisplayImg();
 
   if (DebugSerial >= 1) {
     Serial.println(F("Setup Done!"));
@@ -289,362 +307,445 @@ void loop(){
   // //////////////////////////////////
   //     START OF MAIN BADGE LOOP
   // //////////////////////////////////
-  //     ENSURE EINK_TEST_LOOP NOT 1
-  //     TO ENABLE MAIN BADGE LOOP
-  // //////////////////////////////////
-  // if (EINK_TEST_LOOP == 0) {
 
-    if (DebugSerial >= 1) {
-      Serial.println("********** MAIN BADGE LOOP **********");
+  if (DebugSerial >= 1) {
+    Serial.println("********** MAIN BADGE LOOP **********");
+  }
+
+  // Record the start time of the badge loop
+  LoopTimer = millis();
+
+  // Capacitive Touch Dynamic Threshold Adjustment
+  // Adjust thresholds UP to account for assembly conditions and battery vs usb
+  Touch01_Value = touchRead(TCH01_PIN);
+  Touch02_Value = touchRead(TCH02_PIN);
+  Touch03_Value = touchRead(TCH03_PIN);
+  Touch04_Value = touchRead(TCH04_PIN);
+  if ( (Touch01_Value / Touch01_Threshold) > 2 ) { Touch01_Threshold = int(Touch01_Threshold * 1.8); }
+  if ( (Touch02_Value / Touch02_Threshold) > 2 ) { Touch02_Threshold = int(Touch02_Threshold * 1.8); }
+  if ( (Touch03_Value / Touch03_Threshold) > 2 ) { Touch03_Threshold = int(Touch03_Threshold * 1.8); }
+  if ( (Touch04_Value / Touch04_Threshold) > 2 ) { Touch04_Threshold = int(Touch04_Threshold * 1.8); }
+
+  // //////////////////////////////////
+  //     START OF ITERATION LOOP
+  // //////////////////////////////////
+  
+  // Iterate 0 to 254
+  for(int i=0; i<255; i++){
+    // Set position value to iteration value
+    int pos = i;
+
+    // Record the start time of the iteration loop
+    IterTimer = millis();
+
+    // DEBUG - Print current Iteration value to serial console for troubleshooting
+    if (DebugSerial >= 2) {
+      Serial.print(" I="); Serial.print(i);
+      Serial.print(" Pos="); Serial.print(pos);
     }
 
-    // Capacitive Touch Dynamic Threshold Adjustment
-    // Adjust thresholds UP to account for assembly conditions and battery vs usb
+    // DEBUG - Print Display Cooldown
+    if (DebugSerial >= 2) {
+      Serial.print(" D="); Serial.print(DisplayUpdateCooldown);
+    }
+
+    //
+    // TOUCH
+    //
+    // Read Touch Values
     Touch01_Value = touchRead(TCH01_PIN);
     Touch02_Value = touchRead(TCH02_PIN);
     Touch03_Value = touchRead(TCH03_PIN);
     Touch04_Value = touchRead(TCH04_PIN);
-    if ( (Touch01_Value / Touch01_Threshold) > 2 ) { Touch01_Threshold = int(Touch01_Threshold * 1.8); }
-    if ( (Touch02_Value / Touch02_Threshold) > 2 ) { Touch02_Threshold = int(Touch02_Threshold * 1.8); }
-    if ( (Touch03_Value / Touch03_Threshold) > 2 ) { Touch03_Threshold = int(Touch03_Threshold * 1.8); }
-    if ( (Touch04_Value / Touch04_Threshold) > 2 ) { Touch04_Threshold = int(Touch04_Threshold * 1.8); }
-
-    // //////////////////////////////////
-    //     START OF ITERATION LOOP
-    // //////////////////////////////////
-    
-    // Iterate 0 to 254
-    for(int i=0; i<255; i++){
-      // Set position value to iteration value
-      int pos = i;
-
-      // DEBUG - Print current Iteration value to serial console for troubleshooting
+    //
+    // **************************************************************
+    //
+    // Do Stuff If We Detect a Touch on TCH01_PIN
+    if (Touch01_Value < Touch01_Threshold) {
+      // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
       if (DebugSerial >= 2) {
-        Serial.print(" Iteration="); Serial.print(i);
-        Serial.print(" Pos="); Serial.print(pos);
+        Serial.print(" T1_TCH="); Serial.print(Touch01_Value);
+        Serial.print("/"); Serial.print(Touch01_Threshold);
+        Serial.print("-"); Serial.print(Touch01_IntCount);
+        Serial.print("/"); Serial.print(Touch01_LoopCount);
       }
-
+      // STUFF - TCH01_PIN TOUCHED (use IntCount to avoid glancing touches)
+      if (Touch01_IntFlag == 0 and Touch01_IntCount > Touch01_Iter_Threshold){
+        // Put stuff to happen once per iteration loop here
+        Touch01_IntFlag = 1;
+        if (neo_color_bitv < 7) { neo_color_bitv++; } else { neo_color_bitv = 1;}
+        setStaticColor(0, 0, 0, neo_color_bitv);
+      }
+      // Put stuff to happen every iteration here
+      Touch01_IntCount++;
       //
-      // TOUCH
-      //
-      // Read Touch Values
-      Touch01_Value = touchRead(TCH01_PIN);
-      Touch02_Value = touchRead(TCH02_PIN);
-      Touch03_Value = touchRead(TCH03_PIN);
-      Touch04_Value = touchRead(TCH04_PIN);
-      //
-      // **************************************************************
-      //
-      // Do Stuff If We Detect a Touch on TCH01_PIN
-      if (Touch01_Value < Touch01_Threshold) {
-        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-        if (DebugSerial >= 2) {
-          Serial.print(" T1_TCH="); Serial.print(Touch01_Value);
-          Serial.print("/"); Serial.print(Touch01_Threshold);
-          Serial.print("-"); Serial.print(Touch01_IntCount);
-          Serial.print("/"); Serial.print(Touch01_LoopCount);
-        }
-        // STUFF - TCH01_PIN TOUCHED
-        if (Touch01_IntFlag == 0){
-          // Put stuff to happen once per iteration loop here
-          Touch01_IntFlag = 1;
-        }
-        // Put stuff to happen every iteration here
-        Touch01_IntCount++;
-        //
+      if (Touch01_IntCount > Touch01_Iter_Threshold){
         // **************
         // FUNCTION TO CALL GOES HERE
         // EXAMPLE:
         // monarch_neo_color();
+        digitalWrite(LED_D5, HIGH); // Turn ON Mansion LED
         // **************
-      //
-      // Do Stuff If We DONT Detect a Touch on TCH01_PIN
-      } else {
-        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-        if (DebugSerial >= 2) {
-          Serial.print(" T1="); Serial.print(Touch01_Value);
-          Serial.print("/"); Serial.print(Touch01_Threshold);
-          Serial.print("-"); Serial.print(Touch01_IntCount);
-          Serial.print("/"); Serial.print(Touch01_LoopCount);
-        }
-        // STUFF - TCH01_PIN NOT TOUCHED
-        if (Touch01_IntCount > 1) { Touch01_IntCount--; } else { Touch01_IntCount = 0; }
       }
-      //
-      // **************************************************************
-      //
-      // Do Stuff If We Detect a Touch on TCH02_PIN
-      if (Touch02_Value < Touch02_Threshold) {
-        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-        if (DebugSerial >= 2) {
-          Serial.print(" T2_TCH="); Serial.print(Touch02_Value);
-          Serial.print("/"); Serial.print(Touch02_Threshold);
-          Serial.print("-"); Serial.print(Touch02_IntCount);
-          Serial.print("/"); Serial.print(Touch02_LoopCount);
-        }
-        // STUFF - TCH02_PIN TOUCHED
-        if (Touch02_IntFlag == 0){
-          // Put stuff to happen once per iteration loop here
-          Touch02_IntFlag = 1;
-        }
-        // Put stuff to happen every iteration here
-        Touch02_IntCount++;
-        //
-        // **************
-        // FUNCTION TO CALL GOES HERE
-        // EXAMPLE:
-        // monarch_neo_color();
-        // **************
-      //
-      // Do Stuff If We DONT Detect a Touch on TCH02_PIN
-      } else {
-        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-        if (DebugSerial >= 2) {
-          Serial.print(" T2="); Serial.print(Touch02_Value);
-          Serial.print("/"); Serial.print(Touch02_Threshold);
-          Serial.print("-"); Serial.print(Touch02_IntCount);
-          Serial.print("/"); Serial.print(Touch02_LoopCount);
-        }
-        // STUFF - TCH02_PIN NOT TOUCHED
-        if (Touch02_IntCount > 1) { Touch02_IntCount--; } else { Touch02_IntCount = 0; }
-      }
-      //
-      // **************************************************************
-      //
-      // Do Stuff If We Detect a Touch on TCH03_PIN
-      if (Touch03_Value < Touch03_Threshold) {
-        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-        if (DebugSerial >= 2) {
-          Serial.print(" T3_TCH="); Serial.print(Touch03_Value);
-          Serial.print("/"); Serial.print(Touch03_Threshold);
-          Serial.print("-"); Serial.print(Touch03_IntCount);
-          Serial.print("/"); Serial.print(Touch03_LoopCount);
-        }
-        // STUFF - TCH03_PIN TOUCHED
-        if (Touch03_IntFlag == 0){
-          // Put stuff to happen once per iteration loop here
-          Touch03_IntFlag = 1;
-        }
-        // Put stuff to happen every iteration here
-        Touch03_IntCount++;
-        //
-        // **************
-        // FUNCTION TO CALL GOES HERE
-        // EXAMPLE:
-        // monarch_neo_color();
-        // **************
-      //
-      // Do Stuff If We DONT Detect a Touch on TCH03_PIN
-      } else {
-        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-        if (DebugSerial >= 2) {
-          Serial.print(" T3="); Serial.print(Touch03_Value);
-          Serial.print("/"); Serial.print(Touch03_Threshold);
-          Serial.print("-"); Serial.print(Touch03_IntCount);
-          Serial.print("/"); Serial.print(Touch03_LoopCount);
-        }
-        // STUFF - TCH03_PIN NOT TOUCHED
-        if (Touch03_IntCount > 1) { Touch03_IntCount--; } else { Touch03_IntCount = 0; }
-      }
-      //
-      // **************************************************************
-      //
-      // Do Stuff If We Detect a Touch on TCH04_PIN
-      if (Touch04_Value < Touch04_Threshold) {
-        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-        if (DebugSerial >= 2) {
-          Serial.print(" T4_TCH="); Serial.print(Touch04_Value);
-          Serial.print("/"); Serial.print(Touch04_Threshold);
-          Serial.print("-"); Serial.print(Touch04_IntCount);
-          Serial.print("/"); Serial.print(Touch04_LoopCount);
-        }
-        // STUFF - TCH04_PIN TOUCHED
-        if (Touch04_IntFlag == 0){
-          // Put stuff to happen once per iteration loop here
-          Touch04_IntFlag = 1;
-          ImgElement++;
-          if (ImgElement > ImgMax) { ImgElement = 0; }
-          EPD_init_Fast();                        // Fast screen update initialization.
-          PIC_display(DisplayImage[ImgElement]);  // To Display one image at setup
-          EPD_sleep();                            // Enter sleep mode
-        }
-        // Put stuff to happen every iteration here
-        Touch04_IntCount++;
-        //
-        // **************
-        // FUNCTION TO CALL GOES HERE
-        // EXAMPLE:
-        // monarch_neo_color();
-        // **************
-      //
-      // Do Stuff If We DONT Detect a Touch on TCH04_PIN
-      } else {
-        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-        if (DebugSerial >= 2) {
-          Serial.print(" T4="); Serial.print(Touch04_Value);
-          Serial.print("/"); Serial.print(Touch04_Threshold);
-          Serial.print("-"); Serial.print(Touch04_IntCount);
-          Serial.print("/"); Serial.print(Touch04_LoopCount);
-        }
-        // STUFF - TCH04_PIN NOT TOUCHED
-        if (Touch04_IntCount > 1) { Touch04_IntCount--; } else { Touch04_IntCount = 0; }
-      }
-      //
-      // **************************************************************
-      //
-
-      if (main_led_mode == 0) {
-        //
-        // DEFAULT MODE
-        //
-        // First of three position groups i 0-84
-        if (pos < 85) {
-          //
-          // LED FUNCTIONS
-          BI_blink_three(pos);
-          ledDigitalOn();
-          all_neo_colorshift(pos, 1);
-        // Second of three position groups i 85-169 (pos-85 = 0-84)
-        } else if (pos < 170) {
-          pos = pos - 85;
-          //
-          // LED FUNCTIONS
-          BI_blink_three(pos);
-          ledDigitalOff();
-          all_neo_colorshift(pos, 2);
-        // Third of three position groups i 170-254 (pos-170 = 0-84)
-        } else {
-          pos = pos -170;
-          //
-          // LED FUNCTIONS
-          BI_blink_three(pos);
-          ledDigitalOn();
-          all_neo_colorshift(pos, 3);
-          // // Split third group 3/4 (pos 0-42) for even number of transitions
-          // if (pos <43) {
-          //   //
-          // // Split third group 4/4 (pos 43-84) for even number of transitions
-          // } else {
-          //   //
-          // }
-        }
-      // } else if (main_led_mode == 1) {
-      //   //
-      //   // BATTLE MODE
-      //   //
-      //   // First of three position groups i 0-84
-      //   if (pos < 85) {
-      //     //
-      //     // LED FUNCTIONS
-      //     BI_blink_two(pos);
-      //   // Second of three position groups i 85-169 (pos-85 = 0-84)
-      //   } else if (pos < 170) {
-      //     pos = pos - 85;
-      //     //
-      //     // LED FUNCTIONS
-      //     BI_blink_two(pos);
-      //   // Third of three position groups i 170-254 (pos-170 = 0-84)
-      //   } else {
-      //     pos = pos -170;
-      //     //
-      //     // LED FUNCTIONS
-      //     BI_blink_two(pos);
-      //     // Split third group 3/4 (pos 0-42) for even number of transitions
-      //     if (pos <43) {
-      //       //
-      //     // Split third group 4/4 (pos 43-84) for even number of transitions
-      //     } else {
-      //       //
-      //     }
-      //   }
-      }
-
-      // Display Sleep
-      //EPD_sleep();
-      
-      // DEBUG - Print NEO color vars
+    //
+    // Do Stuff If We DONT Detect a Touch on TCH01_PIN
+    } else {
+      // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
       if (DebugSerial >= 2) {
-        Serial.print(" C="); Serial.print(neo_col_red);
-        Serial.print("/"); Serial.print(neo_col_grn);
-        Serial.print("/"); Serial.print(neo_col_blu);
-        Serial.print("/"); Serial.print(neo_color_bitv);
+        Serial.print(" T1="); Serial.print(Touch01_Value);
+        Serial.print("/"); Serial.print(Touch01_Threshold);
+        Serial.print("-"); Serial.print(Touch01_IntCount);
+        Serial.print("/"); Serial.print(Touch01_LoopCount);
       }
-
-      // DEBUG - Print LED mode
-      if (DebugSerial >= 2) {
-        Serial.print(" Mode="); Serial.print(main_led_mode);
-      }
-
-      // DEBUG - Print Carriage Return for iteration level debug output
-      if (DebugSerial >= 2) {
-        Serial.println();
-      }
-
-      // Display Neopixel values
-      neo_show();
-
-      // Pause the loop to display everything
-      delay(LEDDelayTime);
-
-      // END OF FOR ITERATION LOOP
+      // STUFF - TCH01_PIN NOT TOUCHED
+      if (Touch01_IntCount > 1) { Touch01_IntCount--; } else { Touch01_IntCount = 0; }
     }
-    // //////////////////////////////////
-    //     END OF ITERATION LOOP
-    // //////////////////////////////////
-
-    // Touch Loop Counters - USE TBD
-    if (Touch01_IntCount >= 1) { Touch01_LoopCount++; Touch01_IntCount = 0; } else { Touch01_LoopCount = 0; }
-    if (Touch02_IntCount >= 1) { Touch02_LoopCount++; Touch02_IntCount = 0; } else { Touch02_LoopCount = 0; }
-    if (Touch03_IntCount >= 1) { Touch03_LoopCount++; Touch03_IntCount = 0; } else { Touch03_LoopCount = 0; }
-    if (Touch04_IntCount >= 1) { Touch04_LoopCount++; Touch04_IntCount = 0; } else { Touch04_LoopCount = 0; }
-
-    // Reset Touch Iteration Flags
-    Touch01_IntFlag = 0;
-    Touch02_IntFlag = 0;
-    Touch03_IntFlag = 0;
-    Touch04_IntFlag = 0;
-
-    // Turn off all LEDs at end of loop (Optional for troubleshooting)
-    // ledAllOff();
-
-    // //////////////////////////////////////////////////
     //
-    // Launch BATT_CHRG_NOLED Alternate Mainline Code When
-    // Touch01_LoopCount exceeds Touch01_Loop_Threshold
-    // Touch01 is the Monarch Logo
+    // **************************************************************
     //
-    // //////////////////////////////////////////////////
-    // if (Touch01_LoopCount > Touch01_Loop_Threshold) {
-    //   //
-    //   Serial.println("LONG TOUCH DETECTED on TCH02 - JUMP TO ALTERNATE CODE");
-    //   //
-    //   ledAllOff();
-    //   //
-    //   Touch01_LoopCount = 0;
-    //   //
-    //   // Alternate code loop
-    //   batt_chrg_noled();
-    //   //
-    //   // END ALTERNATE MAIN LOOP
-    //   Serial.println("****************************************");
-    //   Serial.println("***** EXITING BATT_CHRG_NOLED MODE *****");
-    //   Serial.println("****************************************");
-    //   //
-    //   ledAllOff();
-    //   //
-    //   Touch01_LoopCount = 0;
-    //   //
-    //   main_led_mode = 0;
-    //   // Pause before exiting
-    //   delay(100);
-    // }
+    // Do Stuff If We Detect a Touch on TCH02_PIN
+    if (Touch02_Value < Touch02_Threshold) {
+      // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+      if (DebugSerial >= 2) {
+        Serial.print(" T2_TCH="); Serial.print(Touch02_Value);
+        Serial.print("/"); Serial.print(Touch02_Threshold);
+        Serial.print("-"); Serial.print(Touch02_IntCount);
+        Serial.print("/"); Serial.print(Touch02_LoopCount);
+      }
+      // STUFF - TCH02_PIN TOUCHED (use IntCount to avoid glancing touches)
+      if (Touch02_IntFlag == 0 and Touch02_IntCount > Touch02_Iter_Threshold){
+        // Put stuff to happen once per iteration loop here
+        Touch02_IntFlag = 1;
+        main_led_mode = main_led_mode + 1;
+        if (main_led_mode > 1) { main_led_mode = 0; }
+      }
+      // Put stuff to happen every iteration here
+      Touch02_IntCount++;
+      //
+      if (Touch02_IntCount > Touch02_Iter_Threshold){
+        // **************
+        // FUNCTION TO CALL GOES HERE
+        // EXAMPLE:
+        // monarch_neo_color();
+        digitalWrite(LED_D5, HIGH); // Turn ON Mansion LED
+        // **************
+      }
+    //
+    // Do Stuff If We DONT Detect a Touch on TCH02_PIN
+    } else {
+      // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+      if (DebugSerial >= 2) {
+        Serial.print(" T2="); Serial.print(Touch02_Value);
+        Serial.print("/"); Serial.print(Touch02_Threshold);
+        Serial.print("-"); Serial.print(Touch02_IntCount);
+        Serial.print("/"); Serial.print(Touch02_LoopCount);
+      }
+      // STUFF - TCH02_PIN NOT TOUCHED
+      if (Touch02_IntCount > 1) { Touch02_IntCount--; } else { Touch02_IntCount = 0; }
+    }
+    //
+    // **************************************************************
+    //
+    // Do Stuff If We Detect a Touch on TCH03_PIN
+    if (Touch03_Value < Touch03_Threshold) {
+      // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+      if (DebugSerial >= 2) {
+        Serial.print(" T3_TCH="); Serial.print(Touch03_Value);
+        Serial.print("/"); Serial.print(Touch03_Threshold);
+        Serial.print("-"); Serial.print(Touch03_IntCount);
+        Serial.print("/"); Serial.print(Touch03_LoopCount);
+      }
+      // STUFF - TCH03_PIN TOUCHED (use IntCount to avoid glancing touches)
+      if (Touch03_IntFlag == 0 and Touch03_IntCount > Touch03_Iter_Threshold){
+        // Put stuff to happen once per iteration loop here
+        Touch03_IntFlag = 1;
+        // Display the previous image if the cooldown has expired
+        if (DisplayUpdateCooldown == 0) {
+          prevImgElement();
+          fastDisplayImg();
+        }
+        //
+      }
+      // Put stuff to happen every iteration here
+      Touch03_IntCount++;
+      //
+      if (Touch03_IntCount > Touch03_Iter_Threshold){
+        // **************
+        // FUNCTION TO CALL GOES HERE
+        // EXAMPLE:
+        // monarch_neo_color();
+        // **************
+      }
+    //
+    // Do Stuff If We DONT Detect a Touch on TCH03_PIN
+    } else {
+      // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+      if (DebugSerial >= 2) {
+        Serial.print(" T3="); Serial.print(Touch03_Value);
+        Serial.print("/"); Serial.print(Touch03_Threshold);
+        Serial.print("-"); Serial.print(Touch03_IntCount);
+        Serial.print("/"); Serial.print(Touch03_LoopCount);
+      }
+      // STUFF - TCH03_PIN NOT TOUCHED
+      if (Touch03_IntCount > 1) { Touch03_IntCount--; } else { Touch03_IntCount = 0; }
+    }
+    //
+    // **************************************************************
+    //
+    // Do Stuff If We Detect a Touch on TCH04_PIN
+    if (Touch04_Value < Touch04_Threshold) {
+      // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+      if (DebugSerial >= 2) {
+        Serial.print(" T4_TCH="); Serial.print(Touch04_Value);
+        Serial.print("/"); Serial.print(Touch04_Threshold);
+        Serial.print("-"); Serial.print(Touch04_IntCount);
+        Serial.print("/"); Serial.print(Touch04_LoopCount);
+      }
+      // STUFF - TCH04_PIN TOUCHED (use IntCount to avoid glancing touches)
+      if (Touch04_IntFlag == 0 and Touch04_IntCount > Touch04_Iter_Threshold){
+        // Put stuff to happen once per iteration loop here
+        Touch04_IntFlag = 1;
+        // Display the next image if the cooldown has expired
+        if (DisplayUpdateCooldown == 0) {
+          nextImgElement();
+          fastDisplayImg();
+        }
+        //
+      }
+      // Put stuff to happen every iteration here
+      Touch04_IntCount++;
+      //
+      if (Touch04_IntCount > Touch04_Iter_Threshold){
+        // **************
+        // FUNCTION TO CALL GOES HERE
+        // EXAMPLE:
+        // monarch_neo_color();
+        // **************
+      }
+    //
+    // Do Stuff If We DONT Detect a Touch on TCH04_PIN
+    } else {
+      // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+      if (DebugSerial >= 2) {
+        Serial.print(" T4="); Serial.print(Touch04_Value);
+        Serial.print("/"); Serial.print(Touch04_Threshold);
+        Serial.print("-"); Serial.print(Touch04_IntCount);
+        Serial.print("/"); Serial.print(Touch04_LoopCount);
+      }
+      // STUFF - TCH04_PIN NOT TOUCHED
+      if (Touch04_IntCount > 1) { Touch04_IntCount--; } else { Touch04_IntCount = 0; }
+    }
+    //
+    // **************************************************************
+    //
 
+    if (main_led_mode == 0) {
+      //
+      // DEFAULT MODE
+      //
+      // First of three position groups i 0-84
+      if (pos < 85) {
+        //
+        // LED FUNCTIONS
+        BI_blink_three(pos);
+        freeWifi(pos);
+        defcon_neo_color();
+        motel_neo_color(pos, 1);
+      // Second of three position groups i 85-169 (pos-85 = 0-84)
+      } else if (pos < 170) {
+        pos = pos - 85;
+        //
+        // LED FUNCTIONS
+        BI_blink_three(pos);
+        freeWifi(pos);
+        defcon_neo_color();
+        motel_neo_color(pos, 2);
+      // Third of three position groups i 170-254 (pos-170 = 0-84)
+      } else {
+        pos = pos -170;
+        //
+        // LED FUNCTIONS
+        BI_blink_three(pos);
+        freeWifi(pos);
+        defcon_neo_color();
+        motel_neo_color(pos, 3);
+        thunderLightning(pos);
+        // // Split third group 3/4 (pos 0-42) for even number of transitions
+        // if (pos <43) {
+        //   //
+        // // Split third group 4/4 (pos 43-84) for even number of transitions
+        // } else {
+        //   //
+        // }
+      }
+    } else if (main_led_mode == 1) {
+      //
+      // COLORSHIFT MODE
+      //
+      // First of three position groups i 0-84
+      if (pos < 85) {
+        //
+        // LED FUNCTIONS
+        BI_blink_three(pos);
+        defcon_neo_colorshift(pos, 1);
+        motel_neo_colorshift(pos, 1);
+      // Second of three position groups i 85-169 (pos-85 = 0-84)
+      } else if (pos < 170) {
+        pos = pos - 85;
+        //
+        // LED FUNCTIONS
+        BI_blink_three(pos);
+        defcon_neo_colorshift(pos, 2);
+        motel_neo_colorshift(pos, 2);
+      // Third of three position groups i 170-254 (pos-170 = 0-84)
+      } else {
+        pos = pos -170;
+        //
+        // LED FUNCTIONS
+        BI_blink_three(pos);
+        defcon_neo_colorshift(pos, 3);
+        motel_neo_colorshift(pos, 3);
+        thunderLightning(pos);
+        // // Split third group 3/4 (pos 0-42) for even number of transitions
+        // if (pos <43) {
+        //   //
+        // // Split third group 4/4 (pos 43-84) for even number of transitions
+        // } else {
+        //   //
+        // }
+      }
+    // } else if (main_led_mode == 1) {
+    //   //
+    //   // BATTLE MODE
+    //   //
+    //   // First of three position groups i 0-84
+    //   if (pos < 85) {
+    //     //
+    //     // LED FUNCTIONS
+    //     BI_blink_two(pos);
+    //   // Second of three position groups i 85-169 (pos-85 = 0-84)
+    //   } else if (pos < 170) {
+    //     pos = pos - 85;
+    //     //
+    //     // LED FUNCTIONS
+    //     BI_blink_two(pos);
+    //   // Third of three position groups i 170-254 (pos-170 = 0-84)
+    //   } else {
+    //     pos = pos -170;
+    //     //
+    //     // LED FUNCTIONS
+    //     BI_blink_two(pos);
+    //     // Split third group 3/4 (pos 0-42) for even number of transitions
+    //     if (pos <43) {
+    //       //
+    //     // Split third group 4/4 (pos 43-84) for even number of transitions
+    //     } else {
+    //       //
+    //     }
+    //   }
+    }
+    
+    // DEBUG - Print NEO color vars
+    if (DebugSerial >= 2) {
+      Serial.print(" C="); Serial.print(neo_col_red);
+      Serial.print("/"); Serial.print(neo_col_grn);
+      Serial.print("/"); Serial.print(neo_col_blu);
+      Serial.print("/"); Serial.print(neo_color_bitv);
+    }
+
+    // DEBUG - Print LED mode
+    if (DebugSerial >= 2) {
+      Serial.print(" Mode="); Serial.print(main_led_mode);
+    }
+
+    // DEBUG - Print Iteration Time
+    if (DebugSerial >= 2) {
+      Serial.print(" ms="); Serial.print(millis() - IterTimer);
+    }
+
+    // DEBUG - Print Carriage Return for iteration level debug output
+    if (DebugSerial >= 2) {
+      Serial.println();
+    }
+
+    // Display Neopixel values
+    neo_show();
+
+    // Pause the loop to display everything
+    delay(LEDDelayTime);
+
+    // Turn off digital LEDs at the end of the iteration loop
+    ledDigitalOff();
+
+    // END OF FOR ITERATION LOOP
   }
   // //////////////////////////////////
-  //        END OF MAIN BADGE LOOP
+  //     END OF ITERATION LOOP
   // //////////////////////////////////
 
-//}
+  // Touch Loop Counters - USE TBD
+  if (Touch01_IntCount >= 1) { Touch01_LoopCount++; Touch01_IntCount = 0; } else { Touch01_LoopCount = 0; }
+  if (Touch02_IntCount >= 1) { Touch02_LoopCount++; Touch02_IntCount = 0; } else { Touch02_LoopCount = 0; }
+  if (Touch03_IntCount >= 1) { Touch03_LoopCount++; Touch03_IntCount = 0; } else { Touch03_LoopCount = 0; }
+  if (Touch04_IntCount >= 1) { Touch04_LoopCount++; Touch04_IntCount = 0; } else { Touch04_LoopCount = 0; }
+
+  // Reset Touch Iteration Flags
+  Touch01_IntFlag = 0;
+  Touch02_IntFlag = 0;
+  Touch03_IntFlag = 0;
+  Touch04_IntFlag = 0;
+
+  // Decrement Display update cooldown
+  if (DisplayUpdateCooldown > 0) { DisplayUpdateCooldown--; }
+
+  // Turn off all LEDs at end of loop (Optional for troubleshooting)
+  // ledAllOff();
+
+  // //////////////////////////////////////////////////
+  //
+  // Launch BATT_CHRG_NOLED Alternate Mainline Code When
+  // Touch01_LoopCount exceeds Touch01_Loop_Threshold
+  // Touch01 is the Monarch Logo
+  //
+  // //////////////////////////////////////////////////
+  // if (Touch01_LoopCount > Touch01_Loop_Threshold) {
+  //   //
+  //   Serial.println("LONG TOUCH DETECTED on TCH02 - JUMP TO ALTERNATE CODE");
+  //   //
+  //   ledAllOff();
+  //   //
+  //   Touch01_LoopCount = 0;
+  //   //
+  //   // Alternate code loop
+  //   batt_chrg_noled();
+  //   //
+  //   // END ALTERNATE MAIN LOOP
+  //   Serial.println("****************************************");
+  //   Serial.println("***** EXITING BATT_CHRG_NOLED MODE *****");
+  //   Serial.println("****************************************");
+  //   //
+  //   ledAllOff();
+  //   //
+  //   Touch01_LoopCount = 0;
+  //   //
+  //   main_led_mode = 0;
+  //   // Pause before exiting
+  //   delay(100);
+  // }
+
+  // DEBUG - Print Loop Run Time
+  if (DebugSerial >= 1) {
+    Serial.println("  ********** ");
+    Serial.print("  LOOP RUN TIME="); Serial.print(millis() - LoopTimer); Serial.println(" ms");
+    Serial.println("  ********** ");
+    Serial.println("********** END OF MAIN BADGE LOOP **********");
+  }
+
+// //////////////////////////////////
+//        END OF MAIN BADGE LOOP
+// //////////////////////////////////
+
+}
 // //////////////////////////////////
 //        END OF LOOP - MAIN
 // //////////////////////////////////
@@ -689,16 +790,48 @@ void wakeModemSleep() {
 }
 // //////////////////////////////////////////////////
 //
+// DISPLAY Functions
+// //////////////////////////////////////////////////
+void nextImgElement() {
+    ImgElement++;
+    if (ImgElement > ImgMax) { ImgElement = 0; }
+}
+//
+void prevImgElement() {
+    ImgElement--;
+    if (ImgElement < 0) { ImgElement = ImgMax; }
+}
+//
+void fastDisplayImg() {
+    digitalWrite(LED_D6, HIGH); // Turn ON Door LED during update
+    EPD_init_Fast();                        // Fast screen initialization.
+    PIC_display(DisplayImage[ImgElement]);  // Display image
+    EPD_sleep();                            // Enter sleep mode
+    DisplayUpdateCooldown = DisplayUpdateCooldownDefault;
+    digitalWrite(LED_D6, LOW); // Turn OFF Door LED after update
+}
+//
+void fullDisplayImg() {
+    digitalWrite(LED_D6, HIGH); // Turn ON Door LED during update
+    EPD_init();                             // Full screen initialization.
+    PIC_display(DisplayImage[ImgElement]);  // Display image
+    EPD_sleep();                            // Enter sleep mode
+    DisplayUpdateCooldown = DisplayUpdateCooldownDefault;
+    digitalWrite(LED_D6, LOW); // Turn OFF Door LED after update
+}
+//
+// //////////////////////////////////////////////////
+//
 // LED Functions
 // //////////////////////////////////////////////////
 void ledAllOff() {
-    digitalWrite(LED_BI, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D1, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D2, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D3, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D4, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D5, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D6, HIGH); // HIGH = OFF?
+    digitalWrite(LED_BI, HIGH); // HIGH = OFF???
+    digitalWrite(LED_D1, LOW); // LOW = OFF
+    digitalWrite(LED_D2, LOW); // LOW = OFF
+    digitalWrite(LED_D3, LOW); // LOW = OFF
+    digitalWrite(LED_D4, LOW); // LOW = OFF
+    digitalWrite(LED_D5, LOW); // LOW = OFF
+    digitalWrite(LED_D6, LOW); // LOW = OFF
     // ledcWrite(LED_D1_pwm, 0);
     NEO01.setPixelColor(0, 0, 0, 0);
     NEO01.setPixelColor(1, 0, 0, 0);
@@ -713,21 +846,65 @@ void ledAllOff() {
 }
 //
 void ledDigitalOn() {
-    digitalWrite(LED_D1, LOW); // LOW = ON?
-    digitalWrite(LED_D2, LOW); // LOW = ON?
-    digitalWrite(LED_D3, LOW); // LOW = ON?
-    digitalWrite(LED_D4, LOW); // LOW = ON?
-    digitalWrite(LED_D5, LOW); // LOW = ON?
-    digitalWrite(LED_D6, LOW); // LOW = ON?
+    digitalWrite(LED_D1, HIGH); // HIGH = ON
+    digitalWrite(LED_D2, HIGH); // HIGH = ON
+    digitalWrite(LED_D3, HIGH); // HIGH = ON
+    digitalWrite(LED_D4, HIGH); // HIGH = ON
+    digitalWrite(LED_D5, HIGH); // HIGH = ON
+    digitalWrite(LED_D6, HIGH); // HIGH = ON
 }
 //
 void ledDigitalOff() {
-    digitalWrite(LED_D1, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D2, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D3, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D4, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D5, HIGH); // HIGH = OFF?
-    digitalWrite(LED_D6, HIGH); // HIGH = OFF?
+    digitalWrite(LED_D1, LOW); // LOW = OFF
+    digitalWrite(LED_D2, LOW); // LOW = OFF
+    digitalWrite(LED_D3, LOW); // LOW = OFF
+    digitalWrite(LED_D4, LOW); // LOW = OFF
+    digitalWrite(LED_D5, LOW); // LOW = OFF
+    digitalWrite(LED_D6, LOW); // LOW = OFF
+}
+//
+void thunderLightning(uint8_t pos) {
+    // Implement the thunder and lightning effect for the cloud LEDs
+    //
+    // POS = 0-84 | 85 div 4 = 21.25 | 0-21, 22-42, 43-63, 64-84
+    if ((pos >= 0 and pos <= 21) or (pos >= 43 and pos <= 63)) {
+        digitalWrite(LED_D3, LOW); // OFF
+        digitalWrite(LED_D4, HIGH); // ON
+        if (random(0-5) == 2) {
+            digitalWrite(LED_D3, HIGH); // ON
+            digitalWrite(LED_D4, LOW); // OFF
+        }
+    } else if (pos >= 22 and pos <= 42) {
+        digitalWrite(LED_D3, HIGH); // ON
+        digitalWrite(LED_D4, LOW); // OFF
+        if (random(0-5) == 3) {
+            digitalWrite(LED_D3, LOW); // OFF
+            digitalWrite(LED_D4, HIGH); // ON
+        }
+    } else if (pos >= 64 and pos <= 84) {
+        if (pos % 2 == 1) {
+            // If pos is an odd number, flash the corresponding cloud LED
+            digitalWrite(LED_D3, LOW); // OFF
+            digitalWrite(LED_D4, HIGH); // ON
+        } else {
+            // If pos is an even number, flash the other cloud LED
+            digitalWrite(LED_D3, HIGH); // ON
+            digitalWrite(LED_D4, LOW); // OFF
+        }
+    }
+}
+//
+void freeWifi(uint8_t pos) {
+    // Toggle free and wifi LEDs
+    //
+    // POS = 0-84 | 85 div 4 = 21.25 | 0-21, 22-42, 43-63, 64-84
+    if ((pos >= 0 and pos <= 21) or (pos >= 43 and pos <= 63)) {
+        digitalWrite(LED_D1, HIGH); // ON
+        digitalWrite(LED_D2, LOW); // OFF
+    } else {
+        digitalWrite(LED_D2, HIGH); // ON
+        digitalWrite(LED_D1, LOW); // OFF
+    }
 }
 //
 // void ledPwmAllOn() {
@@ -799,8 +976,9 @@ void neo_show() {
 void all_neo_colorshift(uint8_t pos, uint8_t pass) {
     //
     // If Touch Areas were pressed dont do anything here
-    // if (Touch01_IntCount > 0 || Touch02_IntCount > 0 || Touch03_IntCount > 0 || Touch04_IntCount > 0) { pass = 0; }
-
+    if (Touch01_IntCount > 0 || Touch02_IntCount > 0 || Touch03_IntCount > 0 || Touch04_IntCount > 0) {
+      pass = 0;
+    }
     // overall pass color order for 1-3 passes
     // 10 - 11 - 12 - B R
     // 11 - 12 - 24 - R G
@@ -810,7 +988,6 @@ void all_neo_colorshift(uint8_t pos, uint8_t pass) {
     // 22 - 21 - 20 - G B
     // 21 - 20 - 10 - B R
     // 20 - 10 - 11 - R G
-
     //
     // Pass 1 pos 0-84
     if (pass == 1){
@@ -880,6 +1057,260 @@ void all_neo_colorshift(uint8_t pos, uint8_t pass) {
       // Green 255-0 Blue 0-255
       NEO02.setPixelColor(3, 0, int(255 - (pos*3)), int(pos*3));
       NEO02.setPixelColor(0, 0, int(255 - (pos*3)), int(pos*3));
+    }
+}
+//
+void defcon_neo_colorshift(uint8_t pos, uint8_t pass) {
+    //
+    // If Touch Areas were pressed dont do anything here
+    if (Touch01_IntCount > 0 || Touch02_IntCount > 0 || Touch03_IntCount > 0 || Touch04_IntCount > 0) {
+      pass = 0;
+    }
+    // overall pass color order for 1-3 passes
+    // 10 - 11 - 12 - B R
+    // 11 - 12 - 10 - R G
+    // 12 - 10 - 11 - G B
+    //
+    // Pass 1 pos 0-84
+    if (pass == 1){
+      // pass 1 color order
+      // 10 B R
+      // 11 R G
+      // 12 G B
+      // Blue 255-0 Red 0-255
+      NEO01.setPixelColor(0, int(pos*3), 0, int(255 - pos*3));
+      // Red 255-0 Green 0-255
+      NEO01.setPixelColor(1, int(255 - (pos*3)), int(pos*3), 0);
+      // Green 255-0 Blue 0-255
+      NEO01.setPixelColor(2, 0, int(255 - (pos*3)), int(pos*3));
+    }
+    // Pass 2 pos 0-84
+    if (pass == 2){
+      // pass 2 color order
+      // 11 B R
+      // 12 R G
+      // 10 G B
+      // Blue 255-0 Red 0-255
+      NEO01.setPixelColor(1, int(pos*3), 0, int(255 - pos*3));
+      // Red 255-0 Green 0-255
+      NEO01.setPixelColor(2, int(255 - (pos*3)), int(pos*3), 0);
+      // Green 255-0 Blue 0-255
+      NEO01.setPixelColor(0, 0, int(255 - (pos*3)), int(pos*3));
+    }
+    // Pass 3 pos 0-84
+    if (pass == 3){
+      // pass 3 color order
+      // 12 B R
+      // 10 R G
+      // 11 G B
+      // Blue 255-0 Red 0-255
+      NEO01.setPixelColor(2, int(pos*3), 0, int(255 - pos*3));
+      // Red 255-0 Green 0-255
+      NEO01.setPixelColor(0, int(255 - (pos*3)), int(pos*3), 0);
+      // Green 255-0 Blue 0-255
+      NEO01.setPixelColor(1, 0, int(255 - (pos*3)), int(pos*3));
+    }
+}
+//
+void defcon_neo_color() {
+    //
+    // If Touch Areas were pressed dont do anything here
+    if (Touch01_IntCount > 0 || Touch02_IntCount > 0 || Touch03_IntCount > 0 || Touch04_IntCount > 0) {
+        // pass = 0;
+    } else {
+        //
+        NEO01.setPixelColor(0, neo_big_color);
+        NEO01.setPixelColor(1, neo_big_color);
+        NEO01.setPixelColor(2, neo_big_color);
+        //
+    }
+}
+//
+void motel_neo_colorshift(uint8_t pos, uint8_t pass) {
+    //
+    // If Touch Areas were pressed dont do anything here
+    if (Touch01_IntCount > 0 || Touch02_IntCount > 0 || Touch03_IntCount > 0 || Touch04_IntCount > 0) {
+      pass = 0;
+    }
+    // overall pass color order for 1-3 passes
+    // 10 - 11 - 12 - B R
+    // 11 - 12 - 10 - R G
+    // 12 - 10 - 11 - G B
+    //
+    // 24 - 22 - 20 - B R
+    // 22 - 20 - 24 - R G
+    // 20 - 24 - 22 - G B
+    //
+    // Pass 1 pos 0-84
+    if (pass == 1){
+      // pass 1 color order
+      // 24 B R
+      // 22 R G
+      // 20 G B
+      // Blue 255-0 Red 0-255
+      NEO02.setPixelColor(4, int(pos*3), 0, int(255 - pos*3));
+      // Red 255-0 Green 0-255
+      NEO02.setPixelColor(2, int(255 - (pos*3)), int(pos*3), 0);
+      // Green 255-0 Blue 0-255
+      NEO02.setPixelColor(0, 0, int(255 - (pos*3)), int(pos*3));
+      // OFF
+      NEO02.setPixelColor(1, 0, 0, 0);
+      NEO02.setPixelColor(3, 0, 0, 0);
+    }
+    // Pass 2 pos 0-84
+    if (pass == 2){
+      // pass 2 color order
+      // 22 B R
+      // 20 R G
+      // 24 G B
+      // Blue 255-0 Red 0-255
+      NEO02.setPixelColor(2, int(pos*3), 0, int(255 - pos*3));
+      // Red 255-0 Green 0-255
+      NEO02.setPixelColor(0, int(255 - (pos*3)), int(pos*3), 0);
+      // Green 255-0 Blue 0-255
+      NEO02.setPixelColor(4, 0, int(255 - (pos*3)), int(pos*3));
+      // OFF
+      NEO02.setPixelColor(1, 0, 0, 0);
+      NEO02.setPixelColor(3, 0, 0, 0);
+    }
+    // Pass 3 pos 0-84
+    if (pass == 3){
+      // pass 3 color order
+      // 20 B R
+      // 24 R G
+      // 22 G B
+      // Blue 255-0 Red 0-255
+      NEO02.setPixelColor(0, int(pos*3), 0, int(255 - pos*3));
+      // Red 255-0 Green 0-255
+      NEO02.setPixelColor(4, int(255 - (pos*3)), int(pos*3), 0);
+      // Green 255-0 Blue 0-255
+      NEO02.setPixelColor(2, 0, int(255 - (pos*3)), int(pos*3));
+      // OFF
+      NEO02.setPixelColor(1, 0, 0, 0);
+      NEO02.setPixelColor(3, 0, 0, 0);
+    }
+}
+//
+void motel_neo_color(uint8_t pos, uint8_t pass) {
+    //
+    // If Touch Areas were pressed dont do anything here
+    if (Touch01_IntCount > 0 || Touch02_IntCount > 0 || Touch03_IntCount > 0 || Touch04_IntCount > 0) {
+      pass = 0;
+    }
+    //
+    // POS = 0-84 | 85 div 4 = 21.25 | 0-21, 22-42, 43-63, 64-84
+    //
+    // Pass 1
+    // _-_-_-_-_
+    // M-_-_-_-_
+    // _-O-_-_-_
+    // _-_-T-_-_
+    // Pass 2
+    // _-_-_-E-_
+    // _-_-_-_-L
+    // _-_-_-_-_
+    // M-_-_-_-_
+    // Pass 3
+    // _-O-_-_-_
+    // _-_-T-_-_
+    // _-_-_-E-_
+    // _-_-_-_-L
+    //
+    // Pass 1 pos 0-84
+    if (pass == 1){
+        if (pos >= 0 and pos <= 21) {
+            // _-_-_-_-_
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        } else if (pos > 21 and pos <= 42) {
+            // M-_-_-_-_
+            NEO02.setPixelColor(4, neo_big_color);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        } else if (pos > 42 and pos <= 63) {
+            // _-O-_-_-_
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, neo_big_color);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        } else if (pos > 63 and pos <= 84) {
+            // _-_-T-_-_
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, neo_big_color);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        }
+    }
+    // Pass 2 pos 0-84
+    if (pass == 2){
+        if (pos >= 0 and pos <= 21) {
+            // _-_-_-E-_
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, neo_big_color);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        } else if (pos > 21 and pos <= 42) {
+            // _-_-_-_-L
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, neo_big_color);
+        } else if (pos > 42 and pos <= 63) {
+            // _-_-_-_-_
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        } else if (pos > 63 and pos <= 84) {
+            // M-_-_-_-_
+            NEO02.setPixelColor(4, neo_big_color);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        }
+    }
+    // Pass 3 pos 0-84
+    if (pass == 3){
+        if (pos >= 0 and pos <= 21) {
+            // _-O-_-_-_
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, neo_big_color);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        } else if (pos > 21 and pos <= 42) {
+            // _-_-T-_-_
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, neo_big_color);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        } else if (pos > 42 and pos <= 63) {
+            // _-_-_-E-_
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, neo_big_color);
+            NEO02.setPixelColor(0, 0, 0, 0);
+        } else if (pos > 63 and pos <= 84) {
+            // _-_-_-_-L
+            NEO02.setPixelColor(4, 0, 0, 0);
+            NEO02.setPixelColor(3, 0, 0, 0);
+            NEO02.setPixelColor(2, 0, 0, 0);
+            NEO02.setPixelColor(1, 0, 0, 0);
+            NEO02.setPixelColor(0, neo_big_color);
+        }
     }
 }
 //
