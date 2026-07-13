@@ -16,6 +16,8 @@
 #include "psycho_img03.h"
 #include "psycho_img04.h"
 #include "psycho_img05.h"
+#include "psycho_img06.h"
+#include "psycho_img07.h"
 // Include CTF Library
 // #include <psycho_badge_lib.h>
 
@@ -82,6 +84,10 @@ Adafruit_NeoPixel NEO02 = Adafruit_NeoPixel(5, NEO02_DATA, NEO_RGB + NEO_KHZ800)
 //
 // Main LED mode 0=default 1=coloshift 2+=?
 int main_led_mode = 0;
+// Door LED mode toggles on/off - helps light eink display
+int door_led_mode = 0;
+// Free Wifi LED mode toggles flashing/off
+int freewifi_led_mode = 1;
 
 //
 // NeoPixel Big Color Value 32 bit = (W-8bit << 24) + (R-8bit << 16) + (G-8bit <<8) + (B-8bit)
@@ -91,7 +97,7 @@ uint8_t neo_col_red = 0;
 uint8_t neo_col_grn = 0;
 uint8_t neo_col_blu = 0;
 // Neo Color bitvector 1=red 2=green 4=blue (3=R&G 5=R&B 6=G&B 7=R&G&B)
-int neo_color_bitv = 6;
+int neo_color_bitv = 5;
 
 // // PWM Properties
 // //
@@ -153,8 +159,8 @@ int Touch04_LoopCount = 0;
 //   Each Loop is between 6000 and 7000 ms (6 to 7 seconds)
 int Touch01_Loop_Threshold = 3;
 int Touch02_Loop_Threshold = 3;
-int Touch03_Loop_Threshold = 3;
-int Touch04_Loop_Threshold = 3;
+int Touch03_Loop_Threshold = 1;
+int Touch04_Loop_Threshold = 1;
 // Touch Iter Threshold (Touch Held for X Iterations in the main loop)
 //   Used to prevent glancing touches activating the touch events
 //   Each iteration is between 3 and 4 ms
@@ -165,15 +171,17 @@ int Touch04_Iter_Threshold = 9;
 
 // Display Image List
 const unsigned char* const DisplayImage[] = {
-  gImage_psycho_poster_01,
   gImage_psycho_hitchcock_02,
+  gImage_psycho_poster_ylw_01,
+  gImage_dying_reach_05,
+  gImage_scream_red_04,
+  gImage_psycho_crazy_dress_07,
   gImage_psycho_mother_03,
-  gImage_scream_04,
-  gImage_dying_reach_05
+  gImage_psycho_poster_red_06
 };
-int ImgElement = 1;
-int ImgMax = 4;
-int DisplayUpdateCooldownDefault = 2;
+int ImgElement = 0;
+int ImgMax = 6;  // array index max number (0-based)
+int DisplayUpdateCooldownDefault = 2;  // loops to wait between display updates
 int DisplayUpdateCooldown = DisplayUpdateCooldownDefault;
 
 // Loop Control Properties
@@ -373,6 +381,7 @@ void loop(){
       if (Touch01_IntFlag == 0 and Touch01_IntCount > Touch01_Iter_Threshold){
         // Put stuff to happen once per iteration loop here
         Touch01_IntFlag = 1;
+        // Change Static Color for Neopixels
         if (neo_color_bitv < 7) { neo_color_bitv++; } else { neo_color_bitv = 1;}
         setStaticColor(0, 0, 0, neo_color_bitv);
       }
@@ -416,6 +425,7 @@ void loop(){
       if (Touch02_IntFlag == 0 and Touch02_IntCount > Touch02_Iter_Threshold){
         // Put stuff to happen once per iteration loop here
         Touch02_IntFlag = 1;
+        // Change Main LED Mode
         main_led_mode = main_led_mode + 1;
         if (main_led_mode > 1) { main_led_mode = 0; }
       }
@@ -459,11 +469,9 @@ void loop(){
       if (Touch03_IntFlag == 0 and Touch03_IntCount > Touch03_Iter_Threshold){
         // Put stuff to happen once per iteration loop here
         Touch03_IntFlag = 1;
-        // Display the previous image if the cooldown has expired
-        if (DisplayUpdateCooldown == 0) {
-          prevImgElement();
-          fastDisplayImg();
-        }
+        // Change Door LED Mode
+        freewifi_led_mode = freewifi_led_mode + 1;
+        if (freewifi_led_mode > 1) { freewifi_led_mode = 0; }
         //
       }
       // Put stuff to happen every iteration here
@@ -474,6 +482,7 @@ void loop(){
         // FUNCTION TO CALL GOES HERE
         // EXAMPLE:
         // monarch_neo_color();
+        digitalWrite(LED_D5, HIGH); // Turn ON Mansion LED
         // **************
       }
     //
@@ -505,11 +514,9 @@ void loop(){
       if (Touch04_IntFlag == 0 and Touch04_IntCount > Touch04_Iter_Threshold){
         // Put stuff to happen once per iteration loop here
         Touch04_IntFlag = 1;
-        // Display the next image if the cooldown has expired
-        if (DisplayUpdateCooldown == 0) {
-          nextImgElement();
-          fastDisplayImg();
-        }
+        // Change Door LED Mode
+        door_led_mode = door_led_mode + 1;
+        if (door_led_mode > 1) { door_led_mode = 0; }
         //
       }
       // Put stuff to happen every iteration here
@@ -520,6 +527,7 @@ void loop(){
         // FUNCTION TO CALL GOES HERE
         // EXAMPLE:
         // monarch_neo_color();
+        digitalWrite(LED_D5, HIGH); // Turn ON Mansion LED
         // **************
       }
     //
@@ -549,6 +557,7 @@ void loop(){
         // LED FUNCTIONS
         BI_blink_three(pos);
         freeWifi(pos);
+        doorlogo();
         defcon_neo_color();
         motel_neo_color(pos, 1);
       // Second of three position groups i 85-169 (pos-85 = 0-84)
@@ -558,6 +567,7 @@ void loop(){
         // LED FUNCTIONS
         BI_blink_three(pos);
         freeWifi(pos);
+        doorlogo();
         defcon_neo_color();
         motel_neo_color(pos, 2);
       // Third of three position groups i 170-254 (pos-170 = 0-84)
@@ -567,6 +577,7 @@ void loop(){
         // LED FUNCTIONS
         BI_blink_three(pos);
         freeWifi(pos);
+        doorlogo();
         defcon_neo_color();
         motel_neo_color(pos, 3);
         thunderLightning(pos);
@@ -587,6 +598,8 @@ void loop(){
         //
         // LED FUNCTIONS
         BI_blink_three(pos);
+        freeWifi(pos);
+        doorlogo();
         defcon_neo_colorshift(pos, 1);
         motel_neo_colorshift(pos, 1);
       // Second of three position groups i 85-169 (pos-85 = 0-84)
@@ -595,6 +608,8 @@ void loop(){
         //
         // LED FUNCTIONS
         BI_blink_three(pos);
+        freeWifi(pos);
+        doorlogo();
         defcon_neo_colorshift(pos, 2);
         motel_neo_colorshift(pos, 2);
       // Third of three position groups i 170-254 (pos-170 = 0-84)
@@ -603,9 +618,11 @@ void loop(){
         //
         // LED FUNCTIONS
         BI_blink_three(pos);
+        freeWifi(pos);
+        doorlogo();
         defcon_neo_colorshift(pos, 3);
         motel_neo_colorshift(pos, 3);
-        thunderLightning(pos);
+        // thunderLightning(pos);
         // // Split third group 3/4 (pos 0-42) for even number of transitions
         // if (pos <43) {
         //   //
@@ -700,6 +717,44 @@ void loop(){
 
   // Turn off all LEDs at end of loop (Optional for troubleshooting)
   // ledAllOff();
+
+  // //////////////////////////////////////////////////
+  //
+  // Change Display to PREV Image When
+  // Touch03_LoopCount exceeds Touch03_Loop_Threshold 
+  // and DisplayUpdateCooldown is 0
+  // Touch04 is the CAR
+  //
+  // //////////////////////////////////////////////////
+  if (Touch03_LoopCount > Touch03_Loop_Threshold and DisplayUpdateCooldown == 0) {
+    //
+    Serial.println("LONG TOUCH DETECTED on TCH03 - Update Display PREV Image");
+    //
+    Touch03_LoopCount = 0;
+    //
+    // Update Display PREV Image
+    prevImgElement();
+    fastDisplayImg();
+  }
+
+  // //////////////////////////////////////////////////
+  //
+  // Change Display to NEXT Image When
+  // Touch04_LoopCount exceeds Touch04_Loop_Threshold 
+  // and DisplayUpdateCooldown is 0
+  // Touch04 is the KNIFE
+  //
+  // //////////////////////////////////////////////////
+  if (Touch04_LoopCount > Touch04_Loop_Threshold and DisplayUpdateCooldown == 0) {
+    //
+    Serial.println("LONG TOUCH DETECTED on TCH04 - Update Display NEXT Image");
+    //
+    Touch04_LoopCount = 0;
+    //
+    // Update Display NEXT Image
+    nextImgElement();
+    fastDisplayImg();
+  }
 
   // //////////////////////////////////////////////////
   //
@@ -895,6 +950,9 @@ void thunderLightning(uint8_t pos) {
 }
 //
 void freeWifi(uint8_t pos) {
+  // freewifi_led_mode 1=toggle-flashing
+  //
+  if (freewifi_led_mode == 1) {
     // Toggle free and wifi LEDs
     //
     // POS = 0-84 | 85 div 4 = 21.25 | 0-21, 22-42, 43-63, 64-84
@@ -905,6 +963,20 @@ void freeWifi(uint8_t pos) {
         digitalWrite(LED_D2, HIGH); // ON
         digitalWrite(LED_D1, LOW); // OFF
     }
+  } else {
+    digitalWrite(LED_D1, LOW); // OFF
+    digitalWrite(LED_D2, LOW); // OFF
+  }
+}
+//
+void doorlogo() {
+  // door_led_mode 1=on
+  //
+  if (door_led_mode == 1) {
+    digitalWrite(LED_D6, HIGH); // ON
+  } else {
+    digitalWrite(LED_D6, LOW); // OFF
+  }
 }
 //
 // void ledPwmAllOn() {
@@ -1133,10 +1205,6 @@ void motel_neo_colorshift(uint8_t pos, uint8_t pass) {
       pass = 0;
     }
     // overall pass color order for 1-3 passes
-    // 10 - 11 - 12 - B R
-    // 11 - 12 - 10 - R G
-    // 12 - 10 - 11 - G B
-    //
     // 24 - 22 - 20 - B R
     // 22 - 20 - 24 - R G
     // 20 - 24 - 22 - G B
