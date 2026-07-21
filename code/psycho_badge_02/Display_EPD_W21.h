@@ -12,6 +12,14 @@
 #define Gate_BITS   200
 #define ALLSCREEN_BYTES   Source_BITS*Gate_BITS/4
 
+// EINK Display Model Selection
+// Set the 'display_model' variable (defined in the main sketch) to one of
+// the values below to select the correct initialization sequence for the
+// EINK panel installed on the badge.
+#define EPD_MODEL_51H 0  // Original GDEM0154F51H panel
+#define EPD_MODEL_61H 1  // Updated GDEM0154F61H panel
+
+extern unsigned char display_model;
 
 //EPD
 void EPD_init(void);

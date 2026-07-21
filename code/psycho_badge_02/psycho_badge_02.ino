@@ -73,6 +73,11 @@
 //
 // Remapping standard SPI MISO pin due to conflict
 #define NEW_MISO_PIN 0  // was 19 which is now LED since EINK does not use MISO
+//
+// EINK Display Model Selection
+// Set to EPD_MODEL_51H for the original GDEM0154F51H panel
+// or EPD_MODEL_61H for the updated GDEM0154F61H panel
+unsigned char display_model = EPD_MODEL_51H;
 
 // NeoPixel Properties
 //
@@ -171,11 +176,11 @@ int Touch04_Iter_Threshold = 9;
 
 // Display Image List
 const unsigned char* const DisplayImage[] = {
+  gImage_dying_reach_05,
   gImage_psycho_hitchcock_02,
   gImage_psycho_poster_ylw_01,
-  gImage_dying_reach_05,
-  gImage_scream_red_04,
   gImage_psycho_crazy_dress_07,
+  gImage_scream_red_04,
   gImage_psycho_mother_03,
   gImage_psycho_poster_red_06
 };
