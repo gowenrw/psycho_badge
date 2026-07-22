@@ -9,15 +9,15 @@
 #include <esp_wifi_types.h>
 #include <esp_wifi.h>
 // EINK Display Libraries
-#include "Display_EPD_W21_spi.h"
-#include "Display_EPD_W21.h"
-#include "psycho_img01.h"
-#include "psycho_img02.h"
-#include "psycho_img03.h"
-#include "psycho_img04.h"
-#include "psycho_img05.h"
-#include "psycho_img06.h"
-#include "psycho_img07.h"
+#include "src/edp/Display_EPD_W21_spi.h"
+#include "src/edp/Display_EPD_W21.h"
+#include "src/img/psycho_img01.h"
+#include "src/img/psycho_img02.h"
+#include "src/img/psycho_img03.h"
+#include "src/img/psycho_img04.h"
+#include "src/img/psycho_img05.h"
+#include "src/img/psycho_img06.h"
+#include "src/img/psycho_img07.h"
 // Include CTF Library
 // #include <psycho_badge_lib.h>
 
@@ -768,30 +768,30 @@ void loop(){
   // Touch01 is the Monarch Logo
   //
   // //////////////////////////////////////////////////
-  // if (Touch01_LoopCount > Touch01_Loop_Threshold) {
-  //   //
-  //   Serial.println("LONG TOUCH DETECTED on TCH02 - JUMP TO ALTERNATE CODE");
-  //   //
-  //   ledAllOff();
-  //   //
-  //   Touch01_LoopCount = 0;
-  //   //
-  //   // Alternate code loop
-  //   batt_chrg_noled();
-  //   //
-  //   // END ALTERNATE MAIN LOOP
-  //   Serial.println("****************************************");
-  //   Serial.println("***** EXITING BATT_CHRG_NOLED MODE *****");
-  //   Serial.println("****************************************");
-  //   //
-  //   ledAllOff();
-  //   //
-  //   Touch01_LoopCount = 0;
-  //   //
-  //   main_led_mode = 0;
-  //   // Pause before exiting
-  //   delay(100);
-  // }
+  if (Touch01_LoopCount > Touch01_Loop_Threshold) {
+    //
+    Serial.println("LONG TOUCH DETECTED on TCH01 - JUMP TO ALTERNATE CODE");
+    //
+    ledAllOff();
+    //
+    Touch01_LoopCount = 0;
+    //
+    // Alternate code loop
+    batt_chrg_noled();
+    //
+    // END ALTERNATE MAIN LOOP
+    Serial.println("****************************************");
+    Serial.println("***** EXITING BATT_CHRG_NOLED MODE *****");
+    Serial.println("****************************************");
+    //
+    ledAllOff();
+    //
+    Touch01_LoopCount = 0;
+    //
+    main_led_mode = 0;
+    // Pause before exiting
+    delay(100);
+  }
 
   // DEBUG - Print Loop Run Time
   if (DebugSerial >= 1) {
@@ -1431,51 +1431,51 @@ void BI_blink_three(uint8_t pos) {
     }
 }
 //
-// void batt_chrg_noled() {
-//     // Set an exit var
-//     bool batt_chrg_noled_active = true;
-//     //
-//     while (batt_chrg_noled_active) {
-//       BI_off();
-//       // Print Serial Message About Mode
-//       Serial.println("****************************************");
-//       Serial.println("****************************************");
-//       Serial.println("********* BATT_CHRG_NOLED MODE *********");
-//       Serial.println("****************************************");
-//       Serial.println("*** ACTIVATED BY LONG TOUCH ON TCH02 ***");
-//       Serial.println("***      THE MONARCH LOGO BUTTON     ***");
-//       Serial.println("****************************************");
-//       Serial.println("** LONG PRESS AGAIN TO EXIT THIS MODE **");
-//       Serial.println("****************************************");
-//       Serial.println("****************************************");
-//       // Pause
-//       delay(3500);
-//       // Turn on-board LED on briefly to show badge is still on
-//       BI_on();
-//       // Pause
-//       delay(500);
-//       //
-//       // Touch for exit mode settings
-//       //
-//       Touch01_Value = touchRead(TCH01_PIN);
-//       // Do Stuff If We Detect a Touch on TCH01_PIN
-//       if (Touch01_Value < Touch01_Threshold) {
-//         // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
-//         if (DebugSerial >= 2) {
-//           Serial.print("T1_TCH="); Serial.print(Touch01_Value);
-//           Serial.print("/"); Serial.print(Touch01_Threshold);
-//           Serial.print("-"); Serial.println(Touch01_LoopCount);
-//         }
-//         // STUFF - TCH01_PIN TOUCHED
-//         Touch01_LoopCount++;
-//       //
-//       // Do Stuff If We DONT Detect a Touch on TCH01_PIN
-//       } else {
-//         // STUFF - TCH01_PIN NOT TOUCHED
-//         Touch01_LoopCount = 0;
-//       }
-//       if (Touch01_LoopCount > Touch01_Loop_Threshold) {
-//         batt_chrg_noled_active = false;
-//       }
-//     }
-// }
+void batt_chrg_noled() {
+    // Set an exit var
+    bool batt_chrg_noled_active = true;
+    //
+    while (batt_chrg_noled_active) {
+      BI_off();
+      // Print Serial Message About Mode
+      Serial.println("****************************************");
+      Serial.println("****************************************");
+      Serial.println("********* BATT_CHRG_NOLED MODE *********");
+      Serial.println("****************************************");
+      Serial.println("*** ACTIVATED BY LONG TOUCH ON TCH01 ***");
+      Serial.println("***   THE BATS AT THE TOP OF BADGE   ***");
+      Serial.println("****************************************");
+      Serial.println("** LONG PRESS AGAIN TO EXIT THIS MODE **");
+      Serial.println("****************************************");
+      Serial.println("****************************************");
+      // Pause
+      delay(3500);
+      // Turn on-board LED on briefly to show badge is still on
+      BI_on();
+      // Pause
+      delay(500);
+      //
+      // Touch for exit mode settings
+      //
+      Touch01_Value = touchRead(TCH01_PIN);
+      // Do Stuff If We Detect a Touch on TCH01_PIN
+      if (Touch01_Value < Touch01_Threshold) {
+        // DEBUG - Print current Touch value/threshold to serial console for troubleshooting
+        if (DebugSerial >= 2) {
+          Serial.print("T1_TCH="); Serial.print(Touch01_Value);
+          Serial.print("/"); Serial.print(Touch01_Threshold);
+          Serial.print("-"); Serial.println(Touch01_LoopCount);
+        }
+        // STUFF - TCH01_PIN TOUCHED
+        Touch01_LoopCount++;
+      //
+      // Do Stuff If We DONT Detect a Touch on TCH01_PIN
+      } else {
+        // STUFF - TCH01_PIN NOT TOUCHED
+        Touch01_LoopCount = 0;
+      }
+      if (Touch01_LoopCount > Touch01_Loop_Threshold) {
+        batt_chrg_noled_active = false;
+      }
+    }
+}
