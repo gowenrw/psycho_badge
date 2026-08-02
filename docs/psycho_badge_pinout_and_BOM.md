@@ -1,8 +1,8 @@
-# Psycho Badge Pinout and BOM
+# Psycho Badge Pinout and Bill of Materials
 
 ## Pinout
 
-ESP32 PINS and Thier Connections on the Badge
+ESP32 PINS and Their Connections on the Badge
 
 NEOPIXEL Strings
 * 27 - Neo String 1 - D10, D11, D12 - Defcon

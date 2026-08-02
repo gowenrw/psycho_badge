@@ -51,6 +51,11 @@ This is still a work in progress, but I will be adding more details soon.
 
 Lets get into the details of this badge, like Art and Schematics and PCB design and Component choices.
 
+## Pinout and Bill of Materials
+
+Since there is a lot of information to cover, I have put the pinout and bill of materials on a separate page here:
+[Psycho Badge Pinout and Bill of Materials](psycho_badge_pinout_and_BOM.md)
+
 ## Schematics 
 
 Since the ESP Dev board has an embedded battery charge circuit and the fact that I moved all the eink display circuitry to a seperate dev board, the schematic for the main badge was fairly simple.
@@ -75,9 +80,9 @@ The PCB layout and tracing of the badge PCBs was a challenge due to all the sold
 
 The PCB layout and tracing of the eink dev board was fairly easy, with the hardest part being squishing everything together to keep the PCB size as small as possible.
 
-![Eink Display Dev PCB Front CU](images/psycho_badge_eink_dev_pcb_front_cu_crop_sm.jpg)
+![Eink Display Dev PCB Front CU](images/psycho_badge_eink_dev_pcb_front_cu_crop.jpg)
 
-![Eink Display Dev PCB Back CU](images/psycho_badge_eink_dev_pcb_back_cu_crop_sm.jpg)
+![Eink Display Dev PCB Back CU](images/psycho_badge_eink_dev_pcb_back_cu_crop.jpg)
 
 The PCB layout and tracing of the SAO was simple given how few components there are.
 
