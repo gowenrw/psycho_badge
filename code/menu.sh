@@ -4,7 +4,7 @@
 ## VARIABLE DEFAULTS
 ########################################
 BoardSerial="not-set"
-CodeSketch="psycho_badge_02"
+CodeSketch="psycho_badge_03"
 
 ########################################
 ## COLOR TEXT SETUP
