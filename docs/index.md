@@ -37,7 +37,32 @@ The badge has two SAO connectors and I made a Psycho themed SAO that pairs well 
 
 # Operations Guide
 
-This is still a work in progress, but I will be adding more details soon.
+## Basic Operation
+
+The on/off switch controls the battery power.  Due to a miscalculation on my part the switch is ON if it is in the down position relative to the top of the badge and OFF in the up position.
+
+The badge can operate on USB C power with the battery switched off and it is recommended for the battery to be off when flashing code or using data to the ESP.
+
+To charge the battery make sure the battery is turned on and plug it into USB power.  You will see an LED indicator on the back of the badge light up while the battery is charging and that light will go off when the battery is fully charged.
+
+## Capacitive Touch Functions
+
+### Short Press Of Touch Pads
+To change the color of the LEDs in the neon sign press the BATS on the top left area of the badge.
+
+To toggle the mode of the LEDs in the neon sign from static color to color wheel shifting colors or back again press the SATELLITE on the top right area of the badge.
+
+To Turn the "Free Wifi" LEDs on or off press the CAR on the bottom left area of the badge.
+
+To Turn the Defcon 34 Logo on the Door on or off press the KNIFE on the bottom right area of the badge. Note: This light also acts as a screen light since the EINK display is not backlit.
+
+### Long Press Of Touch Pads
+
+To change the display image to the next one in order press and hold the KNIFE for about 20 seconds.
+
+To change the display image to the previous one in order press and hold the CAR for about 20 seconds.
+
+To turn off all LEDs on the front of the badge while keeping the badge powered on (useful for battery charging unless you like a night lite) press and hold the BATS for about 40 seconds.
 
 ---
 
